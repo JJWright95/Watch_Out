@@ -10,9 +10,9 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -25,6 +25,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -71,8 +73,10 @@ public class MainActivity extends AppCompatActivity
     private boolean gpsTracking = false;
     // UI button to centre user on map and track when location changed
     private FloatingActionButton fab_gps;
+    // is user on a run, i.e. are we in the 'run loop' - used to toggle button icon
+    private boolean running = false;
     // UI button to start run thread
-    private FloatingActionButton fab_start_run;
+    private FloatingActionButton fab_run;
 
 
     @Override
@@ -88,11 +92,13 @@ public class MainActivity extends AppCompatActivity
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
+            // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+            // See https://g.co/AppIndexing/AndroidStudio for more information.
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
-                    .build();
+                    .addApi(AppIndex.API).build();
         }
 
         // add map fragment to screen layout and initialise map
@@ -117,24 +123,31 @@ public class MainActivity extends AppCompatActivity
                                 // zoom value 15 should use constant
                                 new LatLng(mLastLocation.getLatitude(),
                                         mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                        fab_gps.setImageResource(R.drawable.ic_gps_fixed_blue);
+                    } else {
+                        fab_gps.setImageResource(R.drawable.ic_my_location);
                     }
                     gpsTracking = !gpsTracking;
-                    // TODO: update colour of button to show selected (or not)
                 }
             }
         });
 
-        fab_start_run = (FloatingActionButton) findViewById(R.id.fab_start_run);
-        fab_start_run.setOnClickListener(new View.OnClickListener() {
+        fab_run = (FloatingActionButton) findViewById(R.id.fab_start_run);
+        fab_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // request location data to be turned on in settings if not already enabled
                 settingsRequest();
-                Snackbar.make(view, "Will start run when more code written...", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                // TODO: start run thread here
-                // also need to update the button drawable to a stop run state.
-                fab_start_run.setImageResource(R.drawable.ic_);
+                if (!running) {
+                    // TODO: start run thread here
+                    // also need to update the button drawable to a stop run state.
+                    fab_run.setImageResource(R.drawable.ic_action_playback_stop);
+                    running = !running;
+                } else {
+                    fab_run.setImageResource(R.drawable.ic_directions_run_white);
+                    running = !running;
+                    // TODO: stop run thread here, some static message perhaps
+                }
             }
         });
 
@@ -258,18 +271,44 @@ public class MainActivity extends AppCompatActivity
         mLastLocation = location;
         if (gpsTracking) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                    new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
         }
     }
 
     protected void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        mGoogleApiClient.connect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://uk.ac.cam.lima.pebblecompanion/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
     }
 
     protected void onStop() {
-        mGoogleApiClient.disconnect();
         super.onStop();
+        mGoogleApiClient.disconnect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://uk.ac.cam.lima.pebblecompanion/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
     @Override

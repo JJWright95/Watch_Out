@@ -51,24 +51,38 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private GoogleMap mMap;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private LocationRequest mLocationRequest;
-    private boolean mRequestingLocationUpdates;
-    private boolean gpsTracking = false;
-    private FloatingActionButton fab_gps;
-    private FloatingActionButton fab_start_run;
-    //private LocationManager manager;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    // default zoom on google map when auto tracking
+    private static final int DEFAULT_ZOOM = 15;
+    // frequency of location data updates in milliseconds
+    private static final int LOCATION_DATA_FREQUENCY = 500;
+    // map on main app display
+    private GoogleMap mMap;
+    // google services client
+    private GoogleApiClient mGoogleApiClient;
+    // last location returned by the GPS
+    private Location mLastLocation;
+    // request for location data
+    private LocationRequest mLocationRequest;
+    // is location data being requested
+    private boolean mRequestingLocationUpdates;
+    // is map centering on user when location changes
+    private boolean gpsTracking = false;
+    // UI button to centre user on map and track when location changed
+    private FloatingActionButton fab_gps;
+    // UI button to start run thread
+    private FloatingActionButton fab_start_run;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set xml layout to view on launch
         setContentView(R.layout.activity_main);
+
+        // create toolbar at top of screen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -81,25 +95,31 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
-        // add map fragment and initialise map
+        // add map fragment to screen layout and initialise map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // request location data and set update frequency
         createLocationRequest();
 
         fab_gps = (FloatingActionButton) findViewById(R.id.fab_gps);
         fab_gps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // request location data be turned on in settings if not already
                 settingsRequest();
+                // if location available, centre map on user with DEFAULT_ZOOM
                 if (mLastLocation != null) {
+                    // toggle camera centring on user with default zoom.
                     if (!gpsTracking) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 15));
+                                // zoom value 15 should use constant
+                                new LatLng(mLastLocation.getLatitude(),
+                                        mLastLocation.getLongitude()), DEFAULT_ZOOM));
                     }
                     gpsTracking = !gpsTracking;
-                    // need to update colour of button to show selected
+                    // TODO: update colour of button to show selected (or not)
                 }
             }
         });
@@ -108,12 +128,17 @@ public class MainActivity extends AppCompatActivity
         fab_start_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // request location data to be turned on in settings if not already enabled
                 settingsRequest();
                 Snackbar.make(view, "Will start run when more code written...", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+                // TODO: start run thread here
+                // also need to update the button drawable to a stop run state.
+
             }
         });
 
+        // create app drawer to be pulled out from left edge of screen
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -145,6 +170,7 @@ public class MainActivity extends AppCompatActivity
             // result of the request.
             return;
         }
+        // set blue beacon on map representing users location
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
@@ -165,9 +191,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
+            // TODO: need network permissions for database interaction
         }
     }
 
@@ -203,7 +227,7 @@ public class MainActivity extends AppCompatActivity
                 mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
             }
         } else if (id == R.id.marker_type_1) {
-
+            // TODO: draw different hazard marker types on map if selected
         } else if (id == R.id.marker_type_2) {
 
         } else if (id == R.id.marker_type_3) {
@@ -221,15 +245,17 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    // Initialise a request for high accuracy location data at LOCATION_DATA_FREQUENCY
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(500);
-        mLocationRequest.setFastestInterval(500);
+        mLocationRequest.setInterval(LOCATION_DATA_FREQUENCY);
+        mLocationRequest.setFastestInterval(LOCATION_DATA_FREQUENCY);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        mLastLocation = location;
         if (gpsTracking) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(), location.getLongitude()), 15));
@@ -249,6 +275,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        // when app moves to background, stop requesting location updates
         if (mRequestingLocationUpdates) {
             stopLocationUpdates();
         }
@@ -257,6 +284,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+        // when app gains fore ground, set up google services and request location data
         if (mGoogleApiClient.isConnected()) {
             if (!mRequestingLocationUpdates) {
                 startLocationUpdates();
@@ -266,6 +294,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // If permissions available, request location updates from google services
     protected void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -278,11 +307,13 @@ public class MainActivity extends AppCompatActivity
                 mGoogleApiClient, mLocationRequest, this);
     }
 
+    // stop google services providing location data
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mRequestingLocationUpdates = false;
     }
 
+    // callback function when connected to google services
     @Override
     public void onConnected(Bundle connectionHint) {
         if (ActivityCompat.checkSelfPermission(this,
@@ -292,12 +323,15 @@ public class MainActivity extends AppCompatActivity
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             return;
         }
+        // get initial location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
+            // plot map marker
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
                     .title("Marker in Cambridge"));
         }
+        // start requesting periodic location updates
         mRequestingLocationUpdates = true;
         startLocationUpdates();
     }
@@ -317,8 +351,9 @@ public class MainActivity extends AppCompatActivity
         // More about this in the 'Handle Connection Failures' section.
     }
 
+    // check settings for location, if switched off, open user dialog request.
+    // TODO: check network settings
     public void settingsRequest() {
-        //createLocationRequest();
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
         builder.setAlwaysShow(true);
@@ -329,7 +364,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResult(LocationSettingsResult result) {
                 final Status status = result.getStatus();
-                //final LocationSettingsStates state = result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         // All location settings are satisfied. The client can initialize location
@@ -364,11 +398,10 @@ public class MainActivity extends AppCompatActivity
                         startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:
-                        //settingsRequest();//keep asking if imp or do whatever
+                        // do nothing
                         break;
                 }
                 break;
         }
     }
-
 }

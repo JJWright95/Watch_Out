@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+    <item android:title="Map Options">
+        <menu>
+            <item
+                android:id="@+id/map_satellite"
+                android:icon="@drawable/ic_satellite"
+                android:title="Satellite" />
+            <item
+                android:id="@+id/map_terrain"
+                android:icon="@drawable/ic_terrain"
+                android:title="Terrain" />
+        </menu>
+    </item>
+    </group>
+
+    <group android:checkableBehavior="single">
+    <item android:title="Hazard Markers">
+        <menu>
+            <item
+                android:id="@+id/marker_type_1"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat" />
+            <item
+                android:id="@+id/marker_type_2"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat 2" />
+            <item
+                android:id="@+id/marker_type_3"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat 3" />
+            <item
+                android:id="@+id/marker_type_4"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat 4" />
+            <item
+                android:id="@+id/marker_type_5"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat 5" />
+            <item
+                android:id="@+id/marker_type_6"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Hazard cat 6" />
+        </menu>
+    </item>
+    </group>
+
+</menu>

@@ -15,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.getpebble.android.kit.PebbleKit;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab_gps;
     // UI button to start run thread
     private FloatingActionButton fab_start_run;
+
+    private RunLoop runLoop;
 
 
     @Override
@@ -133,8 +137,10 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.make(view, "Will start run when more code written...", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 // TODO: start run thread here
+                runLoop.run();
+                runLoop.setRunState(RunLoop.RunState.ACTIVE);
                 // also need to update the button drawable to a stop run state.
-                fab_start_run.setImageResource(R.drawable.ic_);
+                //fab_start_run.setImageResource(R.drawable.ic_);
             }
         });
 
@@ -147,6 +153,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Log.i("DataSender", "About to start app");
+        PebbleKit.startAppOnPebble(getApplicationContext(), PebbleSender.PEBBLE_APP_UUID);
+        Log.i("DataSender", "App started");
+
     }
 
     @Override
@@ -330,6 +341,12 @@ public class MainActivity extends AppCompatActivity
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
                     .title("Marker in Cambridge"));
+            runLoop = new RunLoop(this);
+            Log.i("DataSender", "RunLoop created");
+            PebbleSender.startSender(this);
+            Log.i("DataSender", "Sender started");
+            PebbleReceiver.startReceiver(this, runLoop);
+            Log.i("DataSender", "Receiver Started");
         }
         // start requesting periodic location updates
         mRequestingLocationUpdates = true;
@@ -403,5 +420,14 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    boolean locationReady() {
+        return !(mLastLocation == null);
+    }
+
+    LatLng getLocation() {
+
+        return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }
 }

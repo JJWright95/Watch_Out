@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
                             .setAction("Action", null).show();
                 // TODO: start run thread here
                 // also need to update the button drawable to a stop run state.
-
+                fab_start_run.setImageResource(R.drawable.ic_);
             }
         });
 

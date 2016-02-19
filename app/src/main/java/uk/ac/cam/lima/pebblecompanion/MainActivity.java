@@ -2,19 +2,14 @@ package uk.ac.cam.lima.pebblecompanion;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,7 +33,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -147,6 +141,9 @@ public class MainActivity extends AppCompatActivity
                     fab_run.setImageResource(R.drawable.ic_directions_run_white);
                     running = !running;
                     // TODO: stop run thread here, some static message perhaps
+                    // launch review activity
+                    Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
+                    startActivityForResult(openReview, 0);
                 }
             }
         });
@@ -225,33 +222,66 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.map_satellite) {
-            if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                item.setChecked(false);
-            } else {
-                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-            }
-        } else if (id == R.id.map_terrain) {
-            if (mMap.getMapType() == GoogleMap.MAP_TYPE_TERRAIN) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                item.setChecked(false);
-            } else {
-                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-            }
-        } else if (id == R.id.marker_type_1) {
-            // TODO: draw different hazard marker types on map if selected
-        } else if (id == R.id.marker_type_2) {
-
-        } else if (id == R.id.marker_type_3) {
-
-        } else if (id == R.id.marker_type_4) {
-
-        } else if (id == R.id.marker_type_5) {
-
-        } else if (id == R.id.marker_type_6) {
-
+        switch (id) {
+            case R.id.map_satellite:
+                if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                } else {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                }
+                break;
+            case R.id.map_terrain:
+                if (mMap.getMapType() == GoogleMap.MAP_TYPE_TERRAIN) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                } else {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                }
+                break;
+            case R.id.road_works_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all road works markers from map
+                } else {
+                    // TODO: draw all road works markers to map
+                }
+                break;
+            case R.id.pothole_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all pothole markers from map
+                } else {
+                    // TODO: draw all pothole markers to map
+                }
+                break;
+            case R.id.road_closure_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all road closure markers from map
+                } else {
+                    // TODO: draw all road closure markers to map
+                }
+                break;
+            case R.id.flooding_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all flooding markers from map
+                } else {
+                    // TODO: draw all flooding markers to map
+                }
+                break;
+            case R.id.traffic_accident_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all traffic accident markers from map
+                } else {
+                    // TODO: draw all traffic accident markers to map
+                }
+                break;
+            case R.id.broken_glass_marker:
+                if (item.isChecked()) {
+                    // TODO: remove all broken glass markers from map
+                } else {
+                    // TODO: draw all broken glass markers to map
+                }
+                break;
         }
+
+        item.setChecked(!item.isChecked());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

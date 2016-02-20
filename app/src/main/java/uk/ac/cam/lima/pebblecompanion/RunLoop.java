@@ -37,9 +37,9 @@ class RunLoop implements Runnable {
 
     private static final int CACHE_TIMEOUT = 1000; //TODO: set appropriate value (milliseconds)
     private static final double CACHE_RADIUS = 1000; //TODO: set appropriate value
-    private static final int LOOP_DELAY_ACTIVE = 1000; //TODO: set appropriate value
-    private static final int LOOP_DELAY_INACTIVE = 2000; //TODO: set appropriate value
-    private static final double WARN_DISTANCE = 1000; //TODO: set appropriate value
+    private static final int LOOP_DELAY_ACTIVE = 5000; //TODO: set appropriate value
+    private static final int LOOP_DELAY_INACTIVE = 30000; //TODO: set appropriate value
+    private static final double WARN_DISTANCE = 500; //TODO: set appropriate value
     private static final int WARN_DELAY = 1000; //TODO: set appropriate value
 
     private LatLng lastCachedLocation;
@@ -119,9 +119,10 @@ class RunLoop implements Runnable {
                 for (Iterator<Hazard> it = this.activeHazards.iterator(); it.hasNext(); ) {
                     Hazard h = it.next();
                     double distanceFromH = GPS.calculateDistance(h.getLatLong(), currentLocation);
-                    if (distanceFromH <= WARN_DISTANCE) // (I)
+                    /*if (distanceFromH <= WARN_DISTANCE) // (I)
                         PebbleSender.send(PebbleMessage.createUpdate(h, (int) distanceFromH));
-                    else { // (II)
+                    else { // (II)*/
+                    if (distanceFromH > WARN_DISTANCE) {
                         PebbleSender.send(PebbleMessage.createIgnore(h));
                         this.inactiveHazards.put(h, currentTime);
                         it.remove();
@@ -132,9 +133,10 @@ class RunLoop implements Runnable {
             // copy hazards to activeHazards if we are at most WARN_DISTANCE away and the hazard is not in inactiveHazards
             for (Hazard h : HazardManager.getHazardSet()) {
                 double distanceFromH = GPS.calculateDistance(h.getLatLong(), currentLocation);
-                if (distanceFromH <= WARN_DISTANCE && !this.inactiveHazards.keySet().contains(h)) {
+                if (distanceFromH <= WARN_DISTANCE && !this.inactiveHazards.keySet().contains(h) && !this.activeHazards.contains(h)) {
                     PebbleSender.send(PebbleMessage.createAlert(h, (int) distanceFromH));
                     this.activeHazards.add(h);
+                    //TODO:: Attempts to resend each hazard with each pass of RunLoop. Fix, somehow?
                 }
             }
 

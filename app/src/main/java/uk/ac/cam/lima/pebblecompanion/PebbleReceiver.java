@@ -51,6 +51,7 @@ public class PebbleReceiver {
                         switch (PebbleMessage.ActionType.values()[dict.getInteger(PebbleMessage.Key.ACTION.ordinal()).intValue()]) {
                             case ACK:
                                 // User acknowledged the hazard
+                                //TODO:: Wrap up updates in AsyncTasks to prevent NetworkOnMainThreadException
                                 try {
                                     ServerInterface.uploadHazards(HazardManager.getHazardByID(id).increaseAcks());
                                 } catch (IOException ioe) {

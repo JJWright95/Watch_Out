@@ -50,6 +50,12 @@ public class PebbleSender {
         mNackReceiver = new PebbleKit.PebbleNackReceiver(PEBBLE_APP_UUID) {
             @Override
             public void receiveNack(Context context, int transactionId) {
+                boolean connected = PebbleKit.isWatchConnected(parent.getApplicationContext());
+                if (!connected) {
+                    Log.i("DataSender", "Pebble Disconnected. Emptying message queue");
+                    currentSendMessageId = currentQueueMessageId;
+                    return;
+                }
                 Log.i("DataSender", transactionId + " was nacked");
                 if (transactionId == currentSendMessageId)
                     PebbleKit.sendDataToPebbleWithTransactionId(parent.getApplicationContext(),

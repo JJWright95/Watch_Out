@@ -39,7 +39,7 @@ class RunLoop implements Runnable {
     private static final double CACHE_RADIUS = 1000; //TODO: set appropriate value
     private static final int LOOP_DELAY_ACTIVE = 5000; //TODO: set appropriate value
     private static final int LOOP_DELAY_INACTIVE = 30000; //TODO: set appropriate value
-    private static final double WARN_DISTANCE = 700; //TODO: set appropriate value
+    private static final double WARN_DISTANCE = 600; //TODO: set appropriate value
     private static final int WARN_DELAY = 100000; //TODO: set appropriate value
 
     private LatLng lastCachedLocation;

@@ -53,7 +53,7 @@ public class PebbleSender {
                 boolean connected = PebbleKit.isWatchConnected(parent.getApplicationContext());
                 if (!connected) {
                     Log.i("DataSender", "Pebble Disconnected. Emptying message queue");
-                    currentSendMessageId = currentQueueMessageId;
+                    stopSending();
                     return;
                 }
                 Log.i("DataSender", transactionId + " was nacked");
@@ -88,6 +88,10 @@ public class PebbleSender {
 
         PebbleKit.registerReceivedNackHandler(parent.getApplicationContext(), mNackReceiver);
         PebbleKit.registerReceivedAckHandler(parent.getApplicationContext(), mAckReceiver);
+    }
+
+    public static void stopSending() {
+        currentSendMessageId = currentQueueMessageId;
     }
 
     /**

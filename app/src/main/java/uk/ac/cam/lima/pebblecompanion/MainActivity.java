@@ -151,7 +151,9 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     fab_run.setImageResource(R.drawable.ic_directions_run_white);
                     running = !running;
-                    // TODO: stop run thread here, some static message perhaps
+                    // TODO: some static message perhaps
+                    runLoop.setRunState(RunLoop.RunState.INACTIVE);
+                    PebbleSender.stopSending();
                     // launch review activity
                     Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
                     startActivityForResult(openReview, 0);

@@ -133,12 +133,14 @@ public class MainActivity extends AppCompatActivity
         fab_start_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (runLoop == null) return; // location not yet found
                 // request location data to be turned on in settings if not already enabled
                 settingsRequest();
                 Snackbar.make(view, "Will start run when more code written...", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 // TODO: start run thread here
                 if (runLoopThread == null) {
+                    //runLoop = new RunLoop(MainActivity.this);
                     runLoopThread = new Thread(runLoop);
                     runLoopThread.start();
                 }
@@ -161,7 +163,6 @@ public class MainActivity extends AppCompatActivity
         //Log.i("DataSender", "About to start app");
         PebbleKit.startAppOnPebble(getApplicationContext(), PebbleSender.PEBBLE_APP_UUID);
         //Log.i("DataSender", "App started");
-
     }
 
     @Override

@@ -1,12 +1,16 @@
 package uk.ac.cam.lima.pebblecompanion;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The {@code PebbleReceiver} class handles connections from some connected Pebble (if one is connected).
@@ -51,11 +55,27 @@ public class PebbleReceiver {
                         switch (PebbleMessage.ActionType.values()[dict.getInteger(PebbleMessage.Key.ACTION.ordinal()).intValue()]) {
                             case ACK:
                                 // User acknowledged the hazard
-                                //TODO:: Wrap up updates in AsyncTasks to prevent NetworkOnMainThreadException
                                 try {
-                                    ServerInterface.uploadHazards(HazardManager.getHazardByID(id).increaseAcks());
-                                } catch (IOException ioe) {
-                                    ioe.printStackTrace();
+                                    AsyncTask<JSONObject, Void, Void> uploadTask = new AsyncTask<JSONObject, Void, Void>() {
+                                        @Override
+                                        protected Void doInBackground(JSONObject... updateObject) {
+                                            try {
+                                                ServerInterface.uploadHazards(updateObject[0]);
+                                                Log.i("DataReceiver", "Sent Update");
+                                            } catch (IOException ioe) {
+                                                ioe.printStackTrace();
+                                            }
+                                            return null;
+                                        }
+                                    };
+                                    uploadTask.execute(HazardManager.getHazardByID(id).increaseAcks());
+                                    uploadTask.get();
+                                } catch (InterruptedException inte) {
+                                    inte.printStackTrace();
+                                } catch (ExecutionException exe) {
+                                    exe.printStackTrace();
+                                } catch (ClassCastException cce) {
+                                    cce.printStackTrace();
                                 }
                                 runloop.removeActiveHazard(id);
                                 Log.i("DataReceiver", "Received Ack");
@@ -63,9 +83,26 @@ public class PebbleReceiver {
                             case DIS:
                                 // User did not see the hazard
                                 try {
-                                    ServerInterface.uploadHazards(HazardManager.getHazardByID(id).increaseDiss());
-                                } catch (IOException ioe) {
-                                    ioe.printStackTrace();
+                                    AsyncTask<JSONObject, Void, Void> uploadTask = new AsyncTask<JSONObject, Void, Void>() {
+                                        @Override
+                                        protected Void doInBackground(JSONObject... updateObject) {
+                                            try {
+                                                ServerInterface.uploadHazards(updateObject[0]);
+                                                Log.i("DataReceiver", "Sent Update");
+                                            } catch (IOException ioe) {
+                                                ioe.printStackTrace();
+                                            }
+                                            return null;
+                                        }
+                                    };
+                                    uploadTask.execute(HazardManager.getHazardByID(id).increaseDiss());
+                                    uploadTask.get();
+                                } catch (InterruptedException inte) {
+                                    inte.printStackTrace();
+                                } catch (ExecutionException exe) {
+                                    exe.printStackTrace();
+                                } catch (ClassCastException cce) {
+                                    cce.printStackTrace();
                                 }
                                 runloop.removeActiveHazard(id);
                                 Log.i("DataReceiver", "Received Dismissal");

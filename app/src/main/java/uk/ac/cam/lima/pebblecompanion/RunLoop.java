@@ -35,12 +35,12 @@ class RunLoop implements Runnable {
      */
     public void setRunState(RunState rs) { this.runState = rs; }
 
-    private static final int CACHE_TIMEOUT = 1000; //TODO: set appropriate value (milliseconds)
+    private static final int CACHE_TIMEOUT = 60000; //TODO: set appropriate value (milliseconds)
     private static final double CACHE_RADIUS = 1000; //TODO: set appropriate value
     private static final int LOOP_DELAY_ACTIVE = 5000; //TODO: set appropriate value
     private static final int LOOP_DELAY_INACTIVE = 30000; //TODO: set appropriate value
-    private static final double WARN_DISTANCE = 500; //TODO: set appropriate value
-    private static final int WARN_DELAY = 1000; //TODO: set appropriate value
+    private static final double WARN_DISTANCE = 700; //TODO: set appropriate value
+    private static final int WARN_DELAY = 100000; //TODO: set appropriate value
 
     private LatLng lastCachedLocation;
     private Date lastCachedTime;
@@ -73,6 +73,7 @@ class RunLoop implements Runnable {
             for (Iterator<Hazard> it = activeHazards.iterator(); it.hasNext(); ) {
                 Hazard h = it.next();
                 if (h.getId() == hazardID) {
+                    this.inactiveHazards.put(h, new Date());
                     it.remove();
                     break;
                 }
@@ -136,7 +137,6 @@ class RunLoop implements Runnable {
                 if (distanceFromH <= WARN_DISTANCE && !this.inactiveHazards.keySet().contains(h) && !this.activeHazards.contains(h)) {
                     PebbleSender.send(PebbleMessage.createAlert(h, (int) distanceFromH));
                     this.activeHazards.add(h);
-                    //TODO:: Attempts to resend each hazard with each pass of RunLoop. Fix, somehow?
                 }
             }
 
@@ -156,7 +156,7 @@ class RunLoop implements Runnable {
    TODO: remove */
 
 class GPS {
-    //public static LatLng getCurrentLocation() { return new LatLng(10, 20);} //TODO:: Hook up to actual location service
+    //public static LatLng getCurrentLocation() { return new LatLng(10, 20);}
     //public static double calculateDistance(LatLng n, LatLng m) { return 1000; }
     public static double calculateDistance(LatLng n, LatLng m) {
         return 6371000. * Math.acos(Math.sin(n.latitude/57.2958) * Math.sin(m.latitude/57.2958)

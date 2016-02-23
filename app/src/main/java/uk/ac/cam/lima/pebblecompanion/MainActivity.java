@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.getpebble.android.kit.PebbleKit;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -71,6 +74,9 @@ public class MainActivity extends AppCompatActivity
     private boolean running = false;
     // UI button to start run thread
     private FloatingActionButton fab_run;
+
+    private Thread runLoopThread;
+    private RunLoop runLoop;
 
 
     @Override
@@ -130,17 +136,24 @@ public class MainActivity extends AppCompatActivity
         fab_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (runLoop == null) return; // location not yet found
                 // request location data to be turned on in settings if not already enabled
                 settingsRequest();
                 if (!running) {
-                    // TODO: start run thread here
+                    if (runLoopThread == null) {
+						runLoopThread = new Thread(runLoop);
+						runLoopThread.start();
+					}
+					runLoop.setRunState(RunLoop.RunState.ACTIVE);
                     // also need to update the button drawable to a stop run state.
                     fab_run.setImageResource(R.drawable.ic_action_playback_stop);
                     running = !running;
                 } else {
                     fab_run.setImageResource(R.drawable.ic_directions_run_white);
                     running = !running;
-                    // TODO: stop run thread here, some static message perhaps
+                    // TODO: some static message perhaps
+                    runLoop.setRunState(RunLoop.RunState.INACTIVE);
+                    PebbleSender.stopSending();
                     // launch review activity
                     Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
                     startActivityForResult(openReview, 0);
@@ -157,6 +170,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Log.i("DataSender", "About to start app");
+        PebbleKit.startAppOnPebble(getApplicationContext(), PebbleSender.PEBBLE_APP_UUID);
+        //Log.i("DataSender", "App started");
     }
 
     @Override
@@ -399,6 +416,12 @@ public class MainActivity extends AppCompatActivity
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
                     .title("Marker in Cambridge"));
+            runLoop = new RunLoop(this);
+            //Log.i("DataSender", "RunLoop created");
+            PebbleSender.startSender(this);
+            //Log.i("DataSender", "Sender started");
+            PebbleReceiver.startReceiver(this, runLoop);
+            //Log.i("DataSender", "Receiver Started");
         }
         // start requesting periodic location updates
         mRequestingLocationUpdates = true;
@@ -472,5 +495,14 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    boolean locationReady() {
+        return !(mLastLocation == null);
+    }
+
+    LatLng getLocation() {
+
+        return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }
 }

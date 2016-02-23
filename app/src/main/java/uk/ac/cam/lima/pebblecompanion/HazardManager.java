@@ -17,6 +17,9 @@ public final class HazardManager {
     public static Set<Hazard> getHazardSet(){
         return hazardSet;
     }
+    public static Set<Hazard> getNewHazardSet() {
+        return newHazards;
+    }
 
     //Location currLoc = new Location(52.213388, 0.102448);
 

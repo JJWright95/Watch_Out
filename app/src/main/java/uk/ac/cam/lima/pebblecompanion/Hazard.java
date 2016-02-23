@@ -101,6 +101,14 @@ public class Hazard {
         return expires;
     }
 
+    public void setTitle(String t){
+        title = t;
+    }
+
+    public void setDescription(String d){
+        description = d;
+    }
+
     public JSONObject toJSON(){
         JSONObject outputJSON = new JSONObject();
         try {

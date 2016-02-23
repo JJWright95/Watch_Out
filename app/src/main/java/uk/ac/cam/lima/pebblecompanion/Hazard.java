@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
-public class Hazard {
+public class Hazard implements Comparable<Hazard> {
 //TODO:: Add setters for title, description
     //TODO:: Organise expiry system
     private  int id, acks, diss;
@@ -15,6 +15,7 @@ public class Hazard {
     private  double latitude, longitude;
     private  Date reported, expires;
     private SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static int newid = 0;
 
     public Hazard(int newacks, int newdiss, String newtitle, String newdescription, double newlat,
                   double newlong){
@@ -26,6 +27,7 @@ public class Hazard {
         longitude = newlong;
         reported = new Date();
         expires = new Date(reported.getTime() + 100000);
+        id = newid++;
     }
 
     public Hazard(JSONObject jsonInput) {
@@ -125,4 +127,20 @@ public class Hazard {
         return outputJSON;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return (id == ((Hazard)obj).id);
+    }
+
+    @Override
+    public int compareTo(Hazard h) {
+        if (id < h.id) return -1;
+        else if (id == h.id) return 0;
+        return 1;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

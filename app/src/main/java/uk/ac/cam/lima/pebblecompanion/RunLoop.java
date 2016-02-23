@@ -1,6 +1,7 @@
 package uk.ac.cam.lima.pebblecompanion;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -40,7 +41,7 @@ class RunLoop implements Runnable {
     private static final int LOOP_DELAY_ACTIVE = 5000; //TODO: set appropriate value
     private static final int LOOP_DELAY_INACTIVE = 30000; //TODO: set appropriate value
     private static final double WARN_DISTANCE = 600; //TODO: set appropriate value
-    private static final int WARN_DELAY = 100000; //TODO: set appropriate value
+    private static final int WARN_DELAY = 30000; //TODO: set appropriate value
 
     private LatLng lastCachedLocation;
     private Date lastCachedTime;
@@ -75,6 +76,7 @@ class RunLoop implements Runnable {
                 if (h.getId() == hazardID) {
                     this.inactiveHazards.put(h, new Date());
                     it.remove();
+                    Log.i("RunLoop", "Hazard removed from active hazards");
                     break;
                 }
             }
@@ -84,6 +86,8 @@ class RunLoop implements Runnable {
     @Override
     public void run() {
         LatLng currentLocation = parent.getLocation();
+        Log.i("RunLoop", "Latitude: " + currentLocation.latitude);
+        Log.i("RunLoop", "Longitude: " + currentLocation.longitude);
         try {
             HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
         } catch (IOException ioe) {
@@ -111,8 +115,9 @@ class RunLoop implements Runnable {
             // remove hazards from the set of recently warned hazards if at least WARN_DELAY have passed
             for (Iterator<Date> it = this.inactiveHazards.values().iterator(); it.hasNext(); ) {
                 Date nextDate = it.next();
-                if (currentTime.getTime() - nextDate.getTime() >= WARN_DELAY)
-                    it.remove();
+                if (currentTime.getTime() - nextDate.getTime() >= WARN_DELAY){
+                    Log.i("RunLoop", "Hazard removed from inactive hazards");
+                    it.remove();}
             }
 
             // (I) update distance for active hazards or (II) move the hazard to inactiveHazards if we are more than WARN_DISTANCE away
@@ -148,6 +153,13 @@ class RunLoop implements Runnable {
             } catch (InterruptedException ie) {
                 break;
             }
+        }
+    }
+
+    public void logInactiveHazards() {
+        Set<Hazard> keys = this.inactiveHazards.keySet();
+        for (Hazard h : keys) {
+            Log.i("RunLoop", "id: " + h.getId());
         }
     }
 }

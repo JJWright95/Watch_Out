@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,8 +44,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Set;
 
 
 public class MainActivity extends AppCompatActivity
@@ -56,8 +63,8 @@ public class MainActivity extends AppCompatActivity
     private static final int DEFAULT_ZOOM = 15;
     // frequency of location data updates in milliseconds
     private static final int LOCATION_DATA_FREQUENCY = 500;
-    // map on main app display
-    private GoogleMap mMap;
+    // map on main app display. Needs package access for drawing new hazards in PebbleReceiver
+    GoogleMap mMap;
     // google services client
     private GoogleApiClient mGoogleApiClient;
     // last location returned by the GPS
@@ -75,8 +82,23 @@ public class MainActivity extends AppCompatActivity
     // UI button to start run thread
     private FloatingActionButton fab_run;
 
+    private boolean road_works_marker_set = true;
+
+    private boolean pothole_marker_set = true;
+
+    private boolean road_closure_marker_set = true;
+
+    private boolean flooding_marker_set = true;
+
+    private boolean traffic_accident_marker_set = true;
+
+    private boolean broken_glass_marker_set = true;
+
+    private boolean other_marker_set = true;
+
     private Thread runLoopThread;
     private RunLoop runLoop;
+    Handler handler;
 
 
     @Override
@@ -174,6 +196,16 @@ public class MainActivity extends AppCompatActivity
         //Log.i("DataSender", "About to start app");
         PebbleKit.startAppOnPebble(getApplicationContext(), PebbleSender.PEBBLE_APP_UUID);
         //Log.i("DataSender", "App started");
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if(msg.what==0){
+                    updateMapMarkers();
+                }
+                super.handleMessage(msg);
+            }
+        };
     }
 
     @Override
@@ -238,8 +270,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        Set<Hazard> hazardSet = HazardManager.getHazardSet();
         switch (id) {
+            // TODO:: Add option for user-generated hazards
             case R.id.map_satellite:
                 if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -256,44 +289,139 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.road_works_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all road works markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Road Works")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all road works markers to map
+                    // TODO:: Add marker icons for each marker type
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Road Works")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
+                        }
+                    }
                 }
                 break;
             case R.id.pothole_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all pothole markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Pothole")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all pothole markers to map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Pothole")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
+                        }
+                    }
                 }
                 break;
             case R.id.road_closure_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all road closure markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Road Closure")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all road closure markers to map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Road Closure")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                        }
+                    }
                 }
                 break;
             case R.id.flooding_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all flooding markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Flooding")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all flooding markers to map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Flooding")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
+                        }
+                    }
                 }
                 break;
             case R.id.traffic_accident_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all traffic accident markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Traffic Accident")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all traffic accident markers to map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Traffic Accident")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
+                        }
+                    }
                 }
                 break;
             case R.id.broken_glass_marker:
                 if (item.isChecked()) {
-                    // TODO: remove all broken glass markers from map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Broken Glass")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
                 } else {
-                    // TODO: draw all broken glass markers to map
+                    for (Hazard h : hazardSet) {
+                        if (h.getTitle().equals("Broken Glass")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
+                        }
+                    }
+                }
+                break;
+            case R.id.other_marker:
+                if (item.isChecked()) {
+                    for (Hazard h : hazardSet) {
+                        if (!h.getTitle().equals("Road Works")
+                                && ! h.getTitle().equals("Pothole")
+                                && ! h.getTitle().equals("Road Closure")
+                                && ! h.getTitle().equals("Flooding")
+                                && ! h.getTitle().equals("Traffic Accident")
+                                && ! h.getTitle().equals("Broken Glass")) {
+                            Marker m = h.getMarker();
+                            if (m != null) m.remove();
+                            h.setMarker(null);
+                        }
+                    }
+                } else {
+                    for (Hazard h : hazardSet) {
+                        if (!h.getTitle().equals("Road Works")
+                                && ! h.getTitle().equals("Pothole")
+                                && ! h.getTitle().equals("Road Closure")
+                                && ! h.getTitle().equals("Flooding")
+                                && ! h.getTitle().equals("Traffic Accident")
+                                && ! h.getTitle().equals("Broken Glass")) {
+                            if (h.getMarker() == null)
+                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
+                        }
+                    }
                 }
                 break;
         }
@@ -413,9 +541,9 @@ public class MainActivity extends AppCompatActivity
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
             // plot map marker
-            mMap.addMarker(new MarkerOptions()
+            /*mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
-                    .title("Marker in Cambridge"));
+                    .title("Marker in Cambridge"));*/
             runLoop = new RunLoop(this);
             //Log.i("DataSender", "RunLoop created");
             PebbleSender.startSender(this);
@@ -504,5 +632,41 @@ public class MainActivity extends AppCompatActivity
     LatLng getLocation() {
 
         return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+    }
+
+    private void updateMapMarkers() {
+        for (Hazard h : HazardManager.getHazardSet()) {
+            if (h.getMarker() != null) continue;
+            switch (h.getTitle()) {
+                case "Road Works" :
+                    if (road_works_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
+                    }
+                case "Pothole" :
+                    if (pothole_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
+                    }
+                case "Road Closure" :
+                    if (road_closure_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                    }
+                case "Flooding" :
+                    if (flooding_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
+                    }
+                case "Traffic Accident" :
+                    if (traffic_accident_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
+                    }
+                case "Broken Glass" :
+                    if (broken_glass_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
+                    }
+                default:
+                    if (other_marker_set) {
+                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
+                    }
+            }
+        }
     }
 }

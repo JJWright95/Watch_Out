@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONObject;
 
@@ -43,11 +44,13 @@ public class PebbleReceiver {
                 PebbleKit.sendAckToPebble(context, transactionId);
                 switch (PebbleMessage.Type.values()[dict.getInteger(PebbleMessage.Key.TYPE.ordinal()).intValue()]) {
                     case NEW:
-                        HazardManager.newHazard(new Hazard(0, 0,
+                        Hazard newh = new Hazard(0, 0,
                                 dict.getString(PebbleMessage.Key.HAZARD_TYPE.ordinal()),
                                 "",
                                 parent.getLocation().latitude,
-                                parent.getLocation().longitude));
+                                parent.getLocation().longitude);
+                        HazardManager.newHazard(newh);
+                        newh.setMarker(parent.mMap.addMarker(new MarkerOptions().position(newh.getLatLong()).title(newh.getTitle())));
                         Log.i("DataReceiver", "Received New Hazard");
                         break;
                     case ACTION:

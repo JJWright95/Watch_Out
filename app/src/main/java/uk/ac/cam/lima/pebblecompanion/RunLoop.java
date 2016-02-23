@@ -1,5 +1,6 @@
 package uk.ac.cam.lima.pebblecompanion;
 
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -90,6 +91,9 @@ class RunLoop implements Runnable {
         Log.i("RunLoop", "Longitude: " + currentLocation.longitude);
         try {
             HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
+            Message msg = parent.handler.obtainMessage();
+            msg.what = 0;
+            parent.handler.sendMessage(msg);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } catch (JSONException jsone) {
@@ -105,6 +109,9 @@ class RunLoop implements Runnable {
                     || currentTime.getTime() - this.lastCachedTime.getTime() >= CACHE_TIMEOUT) {
                 try {
                     HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
+                    Message msg = parent.handler.obtainMessage();
+                    msg.what = 0;
+                    parent.handler.sendMessage(msg);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 } catch (JSONException jsone) {

@@ -3,17 +3,18 @@ package uk.ac.cam.lima.pebblecompanion;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
 public class Hazard implements Comparable<Hazard> {
-//TODO:: Add setters for title, description
-    //TODO:: Organise expiry system
     private  int id, acks, diss;
     private  String title, description;
     private  double latitude, longitude;
     private  Date reported, expires;
+    private  Marker marker;
     private SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static int newid = 0;
 
@@ -103,6 +104,8 @@ public class Hazard implements Comparable<Hazard> {
         return expires;
     }
 
+    public Marker getMarker() { return marker; }
+
     public void setTitle(String t){
         title = t;
     }
@@ -110,6 +113,8 @@ public class Hazard implements Comparable<Hazard> {
     public void setDescription(String d){
         description = d;
     }
+
+    public void setMarker(Marker m) { marker = m; }
 
     public JSONObject toJSON(){
         JSONObject outputJSON = new JSONObject();

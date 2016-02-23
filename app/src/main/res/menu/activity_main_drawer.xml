@@ -22,27 +22,38 @@
             <item
                 android:id="@+id/road_works_marker"
                 android:icon="@drawable/ic_warning_black_24dp"
-                android:title="Road Works" />
+                android:title="Road Works"
+                android:checked="true" />
             <item
                 android:id="@+id/pothole_marker"
                 android:icon="@drawable/ic_move_to_inbox_black_24dp"
-                android:title="Pothole" />
+                android:title="Pothole"
+                android:checked="true" />
             <item
                 android:id="@+id/road_closure_marker"
                 android:icon="@drawable/ic_block"
-                android:title="Road Closure" />
+                android:title="Road Closure"
+                android:checked="true" />
             <item
                 android:id="@+id/flooding_marker"
                 android:icon="@drawable/ic_pool_black_24dp"
-                android:title="Flooding" />
+                android:title="Flooding"
+                android:checked="true" />
             <item
                 android:id="@+id/traffic_accident_marker"
                 android:icon="@drawable/ic_directions_car_black_24dp"
-                android:title="Traffic Accident" />
+                android:title="Traffic Accident"
+                android:checked="true" />
             <item
                 android:id="@+id/broken_glass_marker"
                 android:icon="@drawable/ic_local_bar_black_24dp"
-                android:title="Broken Glass" />
+                android:title="Broken Glass"
+                android:checked="true" />
+            <item
+                android:id="@+id/other_marker"
+                android:icon="@drawable/ic_cast_disabled_light"
+                android:title="Other"
+                android:checked="true" />
         </menu>
     </item>
     </group>

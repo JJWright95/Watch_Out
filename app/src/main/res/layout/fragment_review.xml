@@ -13,8 +13,7 @@
         android:id="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="Hazard Title" />
+        android:textSize="20sp" />
 
     <EditText
         android:lines="4"

@@ -1,7 +1,10 @@
 package uk.ac.cam.lima.pebblecompanion;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,15 +22,26 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class ReviewActivity extends AppCompatActivity {
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+
+public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * loaded fragment in memory.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -34,6 +49,9 @@ public class ReviewActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    private GoogleMap mMap;
+    //private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +68,23 @@ public class ReviewActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
+        // add map fragment to screen layout and initialise map
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
+    // callback method to initialise the google map object
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+    }
+
+    // returns reference to the google map object to enable manipulation
+    public GoogleMap getMapRef() {
+        return mMap;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,40 +108,38 @@ public class ReviewActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+    /* A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the hazards to be reviewed.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            for (int i=0; i<4; i++) {
+                HazardReviewFragment newFrag = new HazardReviewFragment();
+                newFrag.setRevActivityRef(ReviewActivity.this);
+                newFrag.setHazard(hazardIter.next());
+                frags.add(newFrag);
+            }
+            // TODO: need an upload fragment added at the end.
         }
+
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a HazardReviewFragment.
-            return HazardReviewFragment.newInstance(position + 1);
+            return frags.get(position);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 5;
+            // Show 1 page for each new hazard
+            return 4;
+            //return newHazards.size(); //
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
-            }
-            return null;
-        }
+        ArrayList<HazardReviewFragment> frags = new ArrayList<HazardReviewFragment>();
+        //Set<Hazard> newHazards = HazardManager.getNewHazardSet();
+        Set<Hazard> newHazards = HazardManager.getHazardSet();
+        Iterator<Hazard> hazardIter = newHazards.iterator();
     }
 }

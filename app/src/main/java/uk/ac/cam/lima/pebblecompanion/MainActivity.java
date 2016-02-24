@@ -213,13 +213,6 @@ public class MainActivity extends AppCompatActivity
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -301,7 +294,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Road Works")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
                         }
                     }
                 }
@@ -319,7 +315,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Pothole")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
                         }
                     }
                 }
@@ -337,7 +336,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Road Closure")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
                         }
                     }
                 }
@@ -355,7 +357,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Flooding")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
                         }
                     }
                 }
@@ -373,7 +378,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Traffic Accident")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
                         }
                     }
                 }
@@ -391,7 +399,10 @@ public class MainActivity extends AppCompatActivity
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Broken Glass")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
                         }
                     }
                 }
@@ -419,7 +430,10 @@ public class MainActivity extends AppCompatActivity
                                 && ! h.getTitle().equals("Traffic Accident")
                                 && ! h.getTitle().equals("Broken Glass")) {
                             if (h.getMarker() == null)
-                                h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
+                                h.setMarker(mMap.addMarker(new MarkerOptions()
+                                        .position(h.getLatLong())
+                                        .title(h.getTitle() + ": " + h.getDescription())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
                         }
                     }
                 }
@@ -540,10 +554,6 @@ public class MainActivity extends AppCompatActivity
         // get initial location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-            // plot map marker
-            /*mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
-                    .title("Marker in Cambridge"));*/
             runLoop = new RunLoop(this);
             //Log.i("DataSender", "RunLoop created");
             PebbleSender.startSender(this);
@@ -587,7 +597,7 @@ public class MainActivity extends AppCompatActivity
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         // All location settings are satisfied. The client can initialize location
-                        // requests here.
+                        // requests. Do nothing.
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         // Location settings are not satisfied. But could be fixed by showing the user
@@ -597,7 +607,7 @@ public class MainActivity extends AppCompatActivity
                             // and check the result in onActivityResult().
                             status.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
+                            e.printStackTrace();
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
@@ -640,31 +650,52 @@ public class MainActivity extends AppCompatActivity
             switch (h.getTitle()) {
                 case "Road Works" :
                     if (road_works_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_black_24dp))));
                     }
                 case "Pothole" :
                     if (pothole_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_black_24dp))));
                     }
                 case "Road Closure" :
                     if (road_closure_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
                     }
                 case "Flooding" :
                     if (flooding_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_black_24dp))));
                     }
                 case "Traffic Accident" :
                     if (traffic_accident_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_black_24dp))));
                     }
                 case "Broken Glass" :
                     if (broken_glass_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp))));
                     }
                 default:
                     if (other_marker_set) {
-                        h.setMarker(mMap.addMarker(new MarkerOptions().position(h.getLatLong()).title(h.getTitle() + ": " + h.getDescription()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
+                        h.setMarker(mMap.addMarker(new MarkerOptions()
+                                .position(h.getLatLong())
+                                .title(h.getTitle() + ": " + h.getDescription())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cast_disabled_light))));
                     }
             }
         }

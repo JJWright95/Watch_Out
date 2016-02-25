@@ -1,4 +1,7 @@
 package uk.ac.cam.lima.pebblecompanion; 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +52,7 @@ class RunLoop implements Runnable {
     private LinkedHashMap<Hazard,Date> inactiveHazards; // recently warned hazards
 
     private MainActivity parent;
+    private ConnectivityManager cm;
 
     public RunLoop(MainActivity mainAct) {
         parent = mainAct;
@@ -64,6 +68,7 @@ class RunLoop implements Runnable {
         this.lastCachedTime = new Date();
         this.activeHazards = Collections.synchronizedSet(new LinkedHashSet<Hazard>());
         this.inactiveHazards = new LinkedHashMap<Hazard,Date>();
+        cm = (ConnectivityManager) parent.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     /**
@@ -91,10 +96,15 @@ class RunLoop implements Runnable {
         Log.i("RunLoop", "Latitude: " + currentLocation.latitude);
         Log.i("RunLoop", "Longitude: " + currentLocation.longitude);
         try {
-            HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
-            Message msg = parent.handler.obtainMessage();
-            msg.what = 0;
-            parent.handler.sendMessage(msg);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+            if (isConnected) {
+                HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
+                Message msg = parent.handler.obtainMessage();
+                msg.what = 0;
+                parent.handler.sendMessage(msg);
+            }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
@@ -107,10 +117,16 @@ class RunLoop implements Runnable {
             if (GPS.calculateDistance(this.lastCachedLocation, currentLocation) >= CACHE_RADIUS
                     || currentTime.getTime() - this.lastCachedTime.getTime() >= CACHE_TIMEOUT) {
                 try {
-                    HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
-                    Message msg = parent.handler.obtainMessage();
-                    msg.what = 0;
-                    parent.handler.sendMessage(msg);
+                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    boolean isConnected = activeNetwork != null &&
+                            activeNetwork.isConnectedOrConnecting();
+                    if (isConnected) {
+                        HazardManager.populateHazardSet(ServerInterface.getHazards(currentLocation));
+                        Message msg = parent.handler.obtainMessage();
+                        msg.what = 0;
+                        parent.handler.sendMessage(msg);
+                    }
+                    lastCachedLocation = currentLocation;
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }

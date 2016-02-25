@@ -16,33 +16,33 @@
     </item>
     </group>
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="all">
     <item android:title="Hazard Markers">
         <menu>
             <item
-                android:id="@+id/marker_type_1"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat" />
+                android:id="@+id/road_works_marker"
+                android:icon="@drawable/ic_warning_black_24dp"
+                android:title="Road Works" />
             <item
-                android:id="@+id/marker_type_2"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat 2" />
+                android:id="@+id/pothole_marker"
+                android:icon="@drawable/ic_move_to_inbox_black_24dp"
+                android:title="Pothole" />
             <item
-                android:id="@+id/marker_type_3"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat 3" />
+                android:id="@+id/road_closure_marker"
+                android:icon="@drawable/ic_block"
+                android:title="Road Closure" />
             <item
-                android:id="@+id/marker_type_4"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat 4" />
+                android:id="@+id/flooding_marker"
+                android:icon="@drawable/ic_pool_black_24dp"
+                android:title="Flooding" />
             <item
-                android:id="@+id/marker_type_5"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat 5" />
+                android:id="@+id/traffic_accident_marker"
+                android:icon="@drawable/ic_directions_car_black_24dp"
+                android:title="Traffic Accident" />
             <item
-                android:id="@+id/marker_type_6"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Hazard cat 6" />
+                android:id="@+id/broken_glass_marker"
+                android:icon="@drawable/ic_local_bar_black_24dp"
+                android:title="Broken Glass" />
         </menu>
     </item>
     </group>

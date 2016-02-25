@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="uk.ac.cam.lima.pebblecompanion.ReviewActivity$HazardReviewFragment">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Hazard Title" />
+
+    <EditText
+        android:lines="4"
+        android:minLines="4"
+        android:gravity="top|left"
+        android:id="@+id/hazard_description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Add description of hazard"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSelectHandle="@color/colorPrimary"
+        android:textSelectHandleLeft="@color/colorPrimary"
+        android:textSelectHandleRight="@color/colorPrimary"
+        android:inputType="textMultiLine" />
+
+</LinearLayout>

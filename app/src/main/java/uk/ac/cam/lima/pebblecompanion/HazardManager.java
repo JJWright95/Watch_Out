@@ -21,6 +21,8 @@ public final class HazardManager {
         return newHazards;
     }
 
+    public static void resetNewHazardSet() { newHazards = new HashSet<Hazard>(); }
+
     //Location currLoc = new Location(52.213388, 0.102448);
 
     private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

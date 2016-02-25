@@ -74,6 +74,13 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSectionsPagerAdapter.newHazards = HazardManager.getNewHazardSet();
+        mSectionsPagerAdapter.hazardIter = mSectionsPagerAdapter.newHazards.iterator();
+    }
+
     // callback method to initialise the google map object
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -115,7 +122,7 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            for (int i=0; i<4; i++) {
+            for (int i=0; i<newHazards.size(); i++) {
                 HazardReviewFragment newFrag = new HazardReviewFragment();
                 newFrag.setRevActivityRef(ReviewActivity.this);
                 newFrag.setHazard(hazardIter.next());
@@ -133,13 +140,13 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         @Override
         public int getCount() {
             // Show 1 page for each new hazard
-            return 4;
-            //return newHazards.size(); //
+            //return 4;
+            return newHazards.size(); //
         }
 
         ArrayList<HazardReviewFragment> frags = new ArrayList<HazardReviewFragment>();
         //Set<Hazard> newHazards = HazardManager.getNewHazardSet();
-        Set<Hazard> newHazards = HazardManager.getHazardSet();
+        Set<Hazard> newHazards = HazardManager.getNewHazardSet();
         Iterator<Hazard> hazardIter = newHazards.iterator();
     }
 }

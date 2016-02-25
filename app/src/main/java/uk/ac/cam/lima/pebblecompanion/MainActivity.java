@@ -177,8 +177,10 @@ public class MainActivity extends AppCompatActivity
                     runLoop.setRunState(RunLoop.RunState.INACTIVE);
                     PebbleSender.stopSending();
                     // launch review activity
-                    Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
-                    startActivityForResult(openReview, 0);
+                    if (HazardManager.getNewHazardSet().size() > 0) {
+                        Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
+                        startActivityForResult(openReview, 0);
+                    }
                 }
             }
         });
@@ -640,7 +642,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     LatLng getLocation() {
-
+        if (!locationReady()) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //if (locationReady()) {
+                    //    return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    //}
+                }
+            }, 500);
+            if (locationReady()) {
+                return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            }
+        } else {
+            return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
         return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }
 

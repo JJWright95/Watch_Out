@@ -1,4 +1,5 @@
 package uk.ac.cam.lima.pebblecompanion; 
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -58,7 +59,7 @@ class RunLoop implements Runnable {
                 inte.printStackTrace();
             }
         }*/
-        LatLng currentLocation = parent.getLocation();
+        LatLng currentLocation = null;
         this.lastCachedLocation = currentLocation;
         this.lastCachedTime = new Date();
         this.activeHazards = Collections.synchronizedSet(new LinkedHashSet<Hazard>());
@@ -84,7 +85,9 @@ class RunLoop implements Runnable {
 
     @Override
     public void run() {
+        Looper.prepare();
         LatLng currentLocation = parent.getLocation();
+        lastCachedLocation = currentLocation;
         Log.i("RunLoop", "Latitude: " + currentLocation.latitude);
         Log.i("RunLoop", "Longitude: " + currentLocation.longitude);
         try {

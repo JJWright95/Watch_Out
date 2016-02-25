@@ -1,6 +1,8 @@
 package uk.ac.cam.lima.pebblecompanion;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,6 +27,8 @@ public class PebbleReceiver {
     private static PebbleKit.PebbleDataReceiver mDataReceiver;
     private static MainActivity parent;
     private static RunLoop runloop;
+    private static ConnectivityManager cm;
+
 
     private PebbleReceiver() {}
 
@@ -38,6 +42,7 @@ public class PebbleReceiver {
     public static void startReceiver(final MainActivity mainAct, RunLoop rl) {
         parent = mainAct;
         runloop = rl;
+        cm = (ConnectivityManager) parent.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         mDataReceiver = new PebbleKit.PebbleDataReceiver(PebbleSender.PEBBLE_APP_UUID) {
             @Override
             public void receiveData(Context context, int transactionId, PebbleDictionary dict) {
@@ -63,8 +68,13 @@ public class PebbleReceiver {
                                         @Override
                                         protected Void doInBackground(JSONObject... updateObject) {
                                             try {
-                                                ServerInterface.uploadHazards(updateObject[0]);
-                                                Log.i("DataReceiver", "Sent Update");
+                                                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                                                boolean isConnected = activeNetwork != null &&
+                                                        activeNetwork.isConnectedOrConnecting();
+                                                if (isConnected) {
+                                                    ServerInterface.uploadHazards(updateObject[0]);
+                                                    Log.i("DataReceiver", "Sent Update");
+                                                }
                                             } catch (IOException ioe) {
                                                 ioe.printStackTrace();
                                             }
@@ -90,8 +100,13 @@ public class PebbleReceiver {
                                         @Override
                                         protected Void doInBackground(JSONObject... updateObject) {
                                             try {
-                                                ServerInterface.uploadHazards(updateObject[0]);
-                                                Log.i("DataReceiver", "Sent Update");
+                                                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                                                boolean isConnected = activeNetwork != null &&
+                                                        activeNetwork.isConnectedOrConnecting();
+                                                if (isConnected) {
+                                                    ServerInterface.uploadHazards(updateObject[0]);
+                                                    Log.i("DataReceiver", "Sent Update");
+                                                }
                                             } catch (IOException ioe) {
                                                 ioe.printStackTrace();
                                             }

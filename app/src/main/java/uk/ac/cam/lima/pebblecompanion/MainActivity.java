@@ -10,6 +10,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -162,10 +163,7 @@ public class MainActivity extends AppCompatActivity
                 // request location data to be turned on in settings if not already enabled
                 settingsRequest();
                 if (!running) {
-                    if (runLoopThread == null) {
-						runLoopThread = new Thread(runLoop);
-						runLoopThread.start();
-					}
+
 					runLoop.setRunState(RunLoop.RunState.ACTIVE);
                     // also need to update the button drawable to a stop run state.
                     fab_run.setImageResource(R.drawable.ic_action_playback_stop);
@@ -208,6 +206,20 @@ public class MainActivity extends AppCompatActivity
                 super.handleMessage(msg);
             }
         };
+
+        //if (mLastLocation != null) {
+            runLoop = new RunLoop(this);
+            //Log.i("DataSender", "RunLoop created");
+            PebbleSender.startSender(this);
+            //Log.i("DataSender", "Sender started");
+            PebbleReceiver.startReceiver(this, runLoop);
+            //Log.i("DataSender", "Receiver Started");
+        //}
+
+        //if (runLoopThread == null) {
+            runLoopThread = new Thread(runLoop);
+            runLoopThread.start();
+        //}
     }
 
     @Override
@@ -555,14 +567,7 @@ public class MainActivity extends AppCompatActivity
         }
         // get initial location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            runLoop = new RunLoop(this);
-            //Log.i("DataSender", "RunLoop created");
-            PebbleSender.startSender(this);
-            //Log.i("DataSender", "Sender started");
-            PebbleReceiver.startReceiver(this, runLoop);
-            //Log.i("DataSender", "Receiver Started");
-        }
+
         // start requesting periodic location updates
         mRequestingLocationUpdates = true;
         startLocationUpdates();
@@ -642,20 +647,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     LatLng getLocation() {
-        if (!locationReady()) {
+        while (!locationReady()) {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
                     //if (locationReady()) {
-                    //    return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    //    return;
                     //}
                 }
-            }, 500);
-            if (locationReady()) {
+            }, 1000);
+            /*if (locationReady()) {
                 return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            }
-        } else {
-            return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            }*/
+            Log.i("MainAct", "Waited a sec");
         }
         return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }

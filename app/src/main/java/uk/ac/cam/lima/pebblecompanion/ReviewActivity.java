@@ -74,11 +74,14 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }
 
+    public SectionsPagerAdapter getSectionsPagerAdapterRef() {
+        return mSectionsPagerAdapter;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        mSectionsPagerAdapter.newHazards = HazardManager.getNewHazardSet();
-        mSectionsPagerAdapter.hazardIter = mSectionsPagerAdapter.newHazards.iterator();
+        mSectionsPagerAdapter.newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
     }
 
     // callback method to initialise the google map object
@@ -125,28 +128,48 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
             for (int i=0; i<newHazards.size(); i++) {
                 HazardReviewFragment newFrag = new HazardReviewFragment();
                 newFrag.setRevActivityRef(ReviewActivity.this);
-                newFrag.setHazard(hazardIter.next());
+                newFrag.setHazard(newHazards.get(i));
                 frags.add(newFrag);
             }
-            // TODO: need an upload fragment added at the end.
+            lastFrag = new UploadFragment();
+            lastFrag.setRevActivityRef(ReviewActivity.this);
         }
 
 
         @Override
         public Fragment getItem(int position) {
-            return frags.get(position);
+            if (position < frags.size()) {
+                return frags.get(position);
+            } else {
+                return lastFrag;
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 1 page for each new hazard
-            //return 4;
-            return newHazards.size(); //
+            // Show 1 page for each new hazard and the final upload screen
+            return newHazards.size()+1;
         }
 
+        public LatLng getCentrePos() {
+            double lat = 0;
+            double lon = 0;
+            for (int i=0; i<newHazards.size(); i++) {
+                lat += frags.get(i).getHazard().getLatitude();
+                lon += frags.get(i).getHazard().getLongitude();
+            }
+            return new LatLng(lat / newHazards.size(), lon / newHazards.size());
+        }
+
+        public void upload() {
+            for (int i=0; i<newHazards.size(); i++) {
+                newHazards.get(i).setDescription(frags.get(i).getDescription());
+            }
+            // TODO: upload new hazards to database. Need to convert to a set.
+        }
+
+        UploadFragment lastFrag;
         ArrayList<HazardReviewFragment> frags = new ArrayList<HazardReviewFragment>();
-        //Set<Hazard> newHazards = HazardManager.getNewHazardSet();
-        Set<Hazard> newHazards = HazardManager.getNewHazardSet();
-        Iterator<Hazard> hazardIter = newHazards.iterator();
+        ArrayList<Hazard> newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
     }
 }

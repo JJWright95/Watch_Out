@@ -1,0 +1,26 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="uk.ac.cam.lima.pebblecompanion.UploadFragment">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical|center"
+        app:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_send"
+        />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:layout_marginTop="70dp"
+        android:layout_gravity="center"
+        android:text="Report Hazards"/>
+
+</FrameLayout>

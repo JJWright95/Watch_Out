@@ -89,43 +89,43 @@ public class HazardReviewFragment extends Fragment {
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_orange_24dp)));
                 break;
             case "Pothole" :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_orange_24dp)));
                 break;
             case "Road Closure" :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_yellow)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_orange_24dp)));
                 break;
             case "Flooding" :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_orange_24dp)));
                 break;
             case "Traffic Accident" :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_orange_24dp)));
                 break;
             case "Broken Glass" :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_orange_24dp)));
                 break;
             default :
                 getMapRef().addMarker(new MarkerOptions()
                         .position(newHazard.getLatLong())
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_yellow_24dp)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_orange_24dp)));
                 break;
         }
 

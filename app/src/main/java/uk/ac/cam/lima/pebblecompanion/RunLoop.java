@@ -39,12 +39,12 @@ class RunLoop implements Runnable {
      */
     public void setRunState(RunState rs) { this.runState = rs; }
 
-    private static final int CACHE_TIMEOUT = 60000; //TODO: set appropriate value (milliseconds)
+    private static final int CACHE_TIMEOUT = 240000; //TODO: set appropriate value (milliseconds)
     private static final double CACHE_RADIUS = 1000; //TODO: set appropriate value
     private static final int LOOP_DELAY_ACTIVE = 5000; //TODO: set appropriate value
     private static final int LOOP_DELAY_INACTIVE = 30000; //TODO: set appropriate value
-    private static final double WARN_DISTANCE = 600; //TODO: set appropriate value
-    private static final int WARN_DELAY = 30000; //TODO: set appropriate value
+    private static final double WARN_DISTANCE = 150; //TODO: set appropriate value
+    private static final int WARN_DELAY = 60000; //TODO: set appropriate value
 
     private LatLng lastCachedLocation;
     private Date lastCachedTime;
@@ -112,6 +112,8 @@ class RunLoop implements Runnable {
         while (true) {
             currentLocation = parent.getLocation();
             Date currentTime = new Date();
+
+            //logNewHazards();
 
             // update the cache if the distance from the last update has equalled or exceeded CACHE_RADIUS or the time from the last update is at least CACHE_TIMEOUT
             if (GPS.calculateDistance(this.lastCachedLocation, currentLocation) >= CACHE_RADIUS
@@ -186,6 +188,13 @@ class RunLoop implements Runnable {
     public void logInactiveHazards() {
         Set<Hazard> keys = this.inactiveHazards.keySet();
         for (Hazard h : keys) {
+            Log.i("RunLoop", "id: " + h.getId());
+        }
+    }
+
+    public void logNewHazards() {
+        Log.i("RunLoop", "New Hazards:");
+        for (Hazard h : HazardManager.getNewHazardSet()) {
             Log.i("RunLoop", "id: " + h.getId());
         }
     }

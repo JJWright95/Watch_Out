@@ -188,6 +188,9 @@ public class MainActivity extends AppCompatActivity
                     if (HazardManager.getNewHazardSet().size() > 0) {
                         Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
                         startActivityForResult(openReview, 0);
+                        for (Hazard h : HazardManager.getHazardSet()) {
+                            h.setMarker(null);
+                        }
                     }
                     line.setVisible(false);
                     locationsList = new LinkedList();
@@ -256,6 +259,7 @@ public class MainActivity extends AppCompatActivity
         line = mMap.addPolyline(new PolylineOptions()
                 .width(10)
                 .color(Color.BLUE));
+        updateMapMarkers();
     }
 
     @Override
@@ -322,7 +326,6 @@ public class MainActivity extends AppCompatActivity
                     }
                     road_works_marker_set = false;
                 } else {
-                    // TODO:: Add marker icons for each marker type
                     for (Hazard h : hazardSet) {
                         if (h.getTitle().equals("Road Works")) {
                             if (h.getMarker() == null)
@@ -376,7 +379,6 @@ public class MainActivity extends AppCompatActivity
                                         .position(h.getLatLong())
                                         .title(h.getTitle() + ": " + h.getDescription())
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_red))));
-                            //TODO:: Change colour when available
                         }
                     }
                     road_closure_marker_set = true;
@@ -566,7 +568,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             mGoogleApiClient.connect();
         }
-        updateMapMarkers();
+        HazardManager.resetNewHazardSet();
     }
 
     // If permissions available, request location updates from google services
@@ -726,7 +728,6 @@ public class MainActivity extends AppCompatActivity
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_red))));
-                        //TODO:: Change colour when available
                     }
                     break;
                 case "Flooding" :
@@ -755,6 +756,8 @@ public class MainActivity extends AppCompatActivity
                     break;
                 default:
                     if (other_marker_set) {
+                        if (h == null) Log.i("MainAct", "h is null");
+                        if (mMap == null) Log.i("MainAct", "mMap is null");
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
@@ -770,7 +773,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_orange_24dp))));
                     }
                     break;
                 case "Pothole" :
@@ -778,7 +781,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_orange_24dp))));
                     }
                     break;
                 case "Road Closure" :
@@ -786,7 +789,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_yellow))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_orange))));
                     }
                     break;
                 case "Flooding" :
@@ -794,7 +797,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_orange_24dp))));
                     }
                     break;
                 case "Traffic Accident" :
@@ -802,7 +805,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_orange_24dp))));
                     }
                     break;
                 case "Broken Glass" :
@@ -810,7 +813,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_orange_24dp))));
                     }
                     break;
                 default:
@@ -818,7 +821,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_yellow_24dp))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_orange_24dp))));
                     }
             }
         }

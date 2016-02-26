@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -29,6 +30,7 @@ public class PebbleReceiver {
     private static MainActivity parent;
     private static RunLoop runloop;
     private static ConnectivityManager cm;
+    private static Date lastTransactionTime;
 
 
     private PebbleReceiver() {}
@@ -44,10 +46,18 @@ public class PebbleReceiver {
         parent = mainAct;
         runloop = rl;
         cm = (ConnectivityManager) parent.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        lastTransactionTime = new Date();
         mDataReceiver = new PebbleKit.PebbleDataReceiver(PebbleSender.PEBBLE_APP_UUID) {
             @Override
             public void receiveData(Context context, int transactionId, PebbleDictionary dict) {
                 PebbleKit.sendAckToPebble(context, transactionId);
+                synchronized(lastTransactionTime) {
+                    Date currentTime = new Date();
+                    long timeDiff = currentTime.getTime() - lastTransactionTime.getTime();
+                    Log.i("Receiver", "timeDiff: " + timeDiff);
+                    if (timeDiff <= 2000) return;
+                    lastTransactionTime = currentTime;
+                }
                 switch (PebbleMessage.Type.values()[dict.getInteger(PebbleMessage.Key.TYPE.ordinal()).intValue()]) {
                     case NEW:
                         Hazard newh = new Hazard(0, 0,
@@ -61,44 +71,43 @@ public class PebbleReceiver {
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_orange_24dp))));
                                 break;
                             case "Pothole" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_orange_24dp))));
                                 break;
                             case "Road Closure" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_yellow))));
-                                //TODO:: Change colour when available
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_orange))));
                                 break;
                             case "Flooding" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_orange_24dp))));
                                 break;
                             case "Traffic Accident" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_orange_24dp))));
                                 break;
                             case "Broken Glass" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_orange_24dp))));
                                 break;
                             default :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_yellow_24dp))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_orange_24dp))));
                         }
                         Log.i("DataReceiver", "Received New Hazard");
                         break;

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,12 +19,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class HazardReviewFragment extends Fragment {
 
+    View rootView;
+
     private static ReviewActivity revActivity;
     private Hazard newHazard;
 
     public void setHazard(Hazard newHaz) {
         newHazard = newHaz;
     }
+
+    public Hazard getHazard() {return newHazard;}
 
     public void setRevActivityRef(ReviewActivity rev) {
         revActivity = rev;
@@ -36,7 +41,7 @@ public class HazardReviewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_review, container, false);
+        rootView = inflater.inflate(R.layout.fragment_review, container, false);
         // set hazard title
         TextView textViewToChange = (TextView) rootView.findViewById(R.id.title);
         textViewToChange.setText(newHazard.getTitle());
@@ -73,5 +78,10 @@ public class HazardReviewFragment extends Fragment {
         getMapRef().addMarker(new MarkerOptions()
                 .position(newHazard.getLatLong())
                 .flat(true));
+    }
+
+    public String getDescription() {
+        EditText descriptionField = (EditText) rootView.findViewById(R.id.hazard_description);
+        return descriptionField.getText().toString();
     }
 }

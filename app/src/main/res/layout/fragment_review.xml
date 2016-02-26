@@ -24,9 +24,6 @@
         android:layout_height="wrap_content"
         android:hint="Add description of hazard"
         android:textCursorDrawable="@drawable/color_cursor"
-        android:textSelectHandle="@color/colorPrimary"
-        android:textSelectHandleLeft="@color/colorPrimary"
-        android:textSelectHandleRight="@color/colorPrimary"
         android:inputType="textMultiLine" />
 
 </LinearLayout>

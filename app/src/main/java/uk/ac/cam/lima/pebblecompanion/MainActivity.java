@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             mGoogleApiClient.connect();
         }
+        updateMapMarkers();
     }
 
     // If permissions available, request location updates from google services

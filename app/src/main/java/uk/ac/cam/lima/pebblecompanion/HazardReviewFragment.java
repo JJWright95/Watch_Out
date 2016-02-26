@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,13 @@ public class HazardReviewFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_review, container, false);
         // set hazard title
         TextView textViewToChange = (TextView) rootView.findViewById(R.id.title);
+        while (newHazard == null) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                }
+            }, 1000);
+        }
         textViewToChange.setText(newHazard.getTitle());
         return rootView;
     }

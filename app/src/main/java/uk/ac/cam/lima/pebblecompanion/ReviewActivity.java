@@ -223,6 +223,7 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
                 }
             }
             HazardManager.resetNewHazardSet();
+            finish();
         }
 
         UploadFragment lastFrag;

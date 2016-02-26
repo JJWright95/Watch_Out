@@ -4,7 +4,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,18 +41,42 @@ public class UploadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_upload, container, false);
+        ((FloatingActionButton) rootView.findViewById(R.id.fab_gps)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                revActivity.getSectionsPagerAdapterRef().upload();
+            }
+        });
         return rootView;
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        focus();
+        if (getMapRef() == null) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    if (getMapRef() != null) {
+                        focus();
+                    }
+                }
+            }, 500);
+            if (getMapRef() != null) {
+                focus();
+            }
+        } else {
+            focus();
+        }
     }
 
     // position and zoom map to show all new hazards.
     private void focus() {
         // TODO: should use constant here for zoom value
+        if (revActivity == null) Log.i("UploadFragment", "revActivity not setup");
+        if (getMapRef() == null) Log.i("UploadFragment", "map ref is null");
+        if (revActivity.getSectionsPagerAdapterRef() == null) Log.i("UploadFragment", "sectionsPagerAdapterRef is null");
+        if (revActivity.getSectionsPagerAdapterRef().getCentrePos() == null) Log.i("UploadFragment", "sectionsPagerAdapterRef.centrePos is null");
         getMapRef().animateCamera(CameraUpdateFactory.newLatLngZoom(
                 revActivity.getSectionsPagerAdapterRef().getCentrePos(), 11));
     }

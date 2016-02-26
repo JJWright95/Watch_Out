@@ -1,7 +1,11 @@
 package uk.ac.cam.lima.pebblecompanion;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,9 +35,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -53,10 +61,15 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
     private GoogleMap mMap;
     //private GoogleApiClient mGoogleApiClient;
 
+
+    private ConnectivityManager cm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
+
+        cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -81,7 +94,8 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onResume() {
         super.onResume();
-        mSectionsPagerAdapter.newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
+        //mSectionsPagerAdapter.newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
+        mSectionsPagerAdapter.newHazards = HazardManager.getNewHazardSet();
     }
 
     // callback method to initialise the google map object
@@ -125,10 +139,16 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            for (int i=0; i<newHazards.size(); i++) {
+            /*for (int i=0; i<newHazards.size(); i++) {
                 HazardReviewFragment newFrag = new HazardReviewFragment();
                 newFrag.setRevActivityRef(ReviewActivity.this);
                 newFrag.setHazard(newHazards.get(i));
+                frags.add(newFrag);
+            }*/
+            for (Hazard h : newHazards) {
+                HazardReviewFragment newFrag = new HazardReviewFragment();
+                newFrag.setRevActivityRef(ReviewActivity.this);
+                newFrag.setHazard(h);
                 frags.add(newFrag);
             }
             lastFrag = new UploadFragment();
@@ -162,14 +182,52 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         }
 
         public void upload() {
-            for (int i=0; i<newHazards.size(); i++) {
+            /*for (int i=0; i<newHazards.size(); i++) {
                 newHazards.get(i).setDescription(frags.get(i).getDescription());
+            }*/
+            for (int i = 0; i< newHazards.size(); i++) {
+                frags.get(i).getHazard().setDescription(frags.get(i).getDescription());
             }
-            // TODO: upload new hazards to database. Need to convert to a set.
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+            if (isConnected) {
+                for (Hazard h : newHazards) {
+                    try {
+                        AsyncTask<Hazard, Void, Void> uploadTask = new AsyncTask<Hazard, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Hazard... h) {
+                                try {
+                                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                                    boolean isConnected = activeNetwork != null &&
+                                            activeNetwork.isConnectedOrConnecting();
+                                    if (isConnected) {
+                                        ServerInterface.uploadHazards(HazardManager.newHazardJSON(h[0]));
+                                        Log.i("ReviewActivity", "Send new hazard");
+                                    }
+                                } catch (IOException ioe) {
+                                    ioe.printStackTrace();
+                                }
+                                return null;
+                            }
+                        };
+                        uploadTask.execute(h);
+                        uploadTask.get();
+                    } catch (InterruptedException inte) {
+                        inte.printStackTrace();
+                    } catch (ExecutionException exe) {
+                        exe.printStackTrace();
+                    } catch (ClassCastException cce) {
+                        cce.printStackTrace();
+                    }
+                }
+            }
+            HazardManager.resetNewHazardSet();
         }
 
         UploadFragment lastFrag;
         ArrayList<HazardReviewFragment> frags = new ArrayList<HazardReviewFragment>();
-        ArrayList<Hazard> newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
+        //ArrayList<Hazard> newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
+        Set<Hazard> newHazards = HazardManager.getNewHazardSet();
     }
 }

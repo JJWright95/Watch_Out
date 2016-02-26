@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONObject;
@@ -55,7 +56,50 @@ public class PebbleReceiver {
                                 parent.getLocation().latitude,
                                 parent.getLocation().longitude);
                         HazardManager.newHazard(newh);
-                        newh.setMarker(parent.mMap.addMarker(new MarkerOptions().position(newh.getLatLong()).title(newh.getTitle())));
+                        switch (newh.getTitle()) {
+                            case "Road Works" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_yellow_24dp))));
+                                break;
+                            case "Pothole" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_yellow_24dp))));
+                                break;
+                            case "Road Closure" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                                //TODO:: Change colour when available
+                                break;
+                            case "Flooding" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_yellow_24dp))));
+                                break;
+                            case "Traffic Accident" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_yellow_24dp))));
+                                break;
+                            case "Broken Glass" :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_yellow_24dp))));
+                                break;
+                            default :
+                                newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
+                                        .position(newh.getLatLong())
+                                        .title(newh.getTitle())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_yellow_24dp))));
+                        }
                         Log.i("DataReceiver", "Received New Hazard");
                         break;
                     case ACTION:

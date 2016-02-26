@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
+import 	android.graphics.Color;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.google.android.gms.appindexing.Action;
@@ -49,8 +50,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.Set;
+import java.util.List;
+import java.util.LinkedList;
 
 
 public class MainActivity extends AppCompatActivity
@@ -66,6 +71,8 @@ public class MainActivity extends AppCompatActivity
     private static final int LOCATION_DATA_FREQUENCY = 500;
     // map on main app display. Needs package access for drawing new hazards in PebbleReceiver
     GoogleMap mMap;
+    //adds line to track current run
+    Polyline line;
     // google services client
     private GoogleApiClient mGoogleApiClient;
     // last location returned by the GPS
@@ -96,6 +103,8 @@ public class MainActivity extends AppCompatActivity
     private boolean broken_glass_marker_set = true;
 
     private boolean other_marker_set = true;
+
+    private List<LatLng> locationsList = new LinkedList();
 
     private Thread runLoopThread;
     private RunLoop runLoop;
@@ -132,6 +141,7 @@ public class MainActivity extends AppCompatActivity
         // request location data and set update frequency
         createLocationRequest();
 
+
         fab_gps = (FloatingActionButton) findViewById(R.id.fab_gps);
         fab_gps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,11 +173,11 @@ public class MainActivity extends AppCompatActivity
                 // request location data to be turned on in settings if not already enabled
                 settingsRequest();
                 if (!running) {
-
 					runLoop.setRunState(RunLoop.RunState.ACTIVE);
                     // also need to update the button drawable to a stop run state.
                     fab_run.setImageResource(R.drawable.ic_action_playback_stop);
                     running = !running;
+                    line.setVisible(true);
                 } else {
                     fab_run.setImageResource(R.drawable.ic_directions_run_white);
                     running = !running;
@@ -179,6 +189,8 @@ public class MainActivity extends AppCompatActivity
                         Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
                         startActivityForResult(openReview, 0);
                     }
+                    line.setVisible(false);
+                    locationsList = new LinkedList();
                 }
             }
         });
@@ -239,6 +251,11 @@ public class MainActivity extends AppCompatActivity
         // set blue beacon on map representing users location
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        //adds polyline to the map
+        line = mMap.addPolyline(new PolylineOptions()
+                .width(10)
+                .color(Color.BLUE));
     }
 
     @Override
@@ -661,10 +678,13 @@ public class MainActivity extends AppCompatActivity
             }*/
             Log.i("MainAct", "Waited a sec");
         }
-        return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        LatLng currLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        locationsList.add(currLoc);
+        return currLoc;
     }
 
     private void updateMapMarkers() {
+        if (running) line.setPoints(locationsList);
         for (Hazard h : HazardManager.getHazardSet()) {
             if (h.getMarker() != null) continue;
             switch (h.getTitle()) {

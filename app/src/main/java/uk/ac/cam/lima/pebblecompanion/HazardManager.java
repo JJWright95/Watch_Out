@@ -23,8 +23,6 @@ public final class HazardManager {
 
     public static void resetNewHazardSet() { newHazards = new HashSet<Hazard>(); }
 
-    //Location currLoc = new Location(52.213388, 0.102448);
-
     private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private HazardManager(){
@@ -40,7 +38,6 @@ public final class HazardManager {
             for (int i = 1; i <= numberOfHazards; i++) {
                 JSONObject thisHazardJSON = results.getJSONObject(i - 1);
                 Hazard newHazard = new Hazard((JSONObject) thisHazardJSON.get("hazard" + i));
-                System.out.println(newHazard.getLatitude());
                 hazardSet.add(newHazard);
             }
         } catch (JSONException e) {

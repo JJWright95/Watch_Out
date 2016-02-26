@@ -51,7 +51,7 @@
                 android:checked="true" />
             <item
                 android:id="@+id/other_marker"
-                android:icon="@drawable/ic_cast_disabled_light"
+                android:icon="@drawable/ic_error_grey_24dp"
                 android:title="Other"
                 android:checked="true" />
         </menu>

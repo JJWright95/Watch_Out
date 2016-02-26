@@ -71,12 +71,12 @@ public class PebbleSender {
                 if (transactionId == currentSendMessageId) {
                     Log.i("DataSender", "Sent " + currentSendMessageId);
                     currentSendMessageId = (currentSendMessageId + 1) % 256;
+                    try {
+                        Thread.sleep(1000, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     if (currentSendMessageId != currentQueueMessageId) {
-                        try {
-                            Thread.sleep(1000, 0);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         PebbleKit.sendDataToPebbleWithTransactionId(parent.getApplicationContext(),
                                 PEBBLE_APP_UUID,
                                 messages.get(currentSendMessageId),

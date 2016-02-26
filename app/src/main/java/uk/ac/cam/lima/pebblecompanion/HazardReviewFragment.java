@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -83,9 +84,51 @@ public class HazardReviewFragment extends Fragment {
         // TODO: should use constant here for zoom value
         getMapRef().animateCamera(CameraUpdateFactory.newLatLngZoom(
                 newHazard.getLatLong(), 13));
-        getMapRef().addMarker(new MarkerOptions()
-                .position(newHazard.getLatLong())
-                .flat(true));
+        switch (newHazard.getTitle()) {
+            case "Road Works" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_warning_yellow_24dp)));
+                break;
+            case "Pothole" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_move_to_inbox_yellow_24dp)));
+                break;
+            case "Road Closure" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_yellow)));
+                break;
+            case "Flooding" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pool_yellow_24dp)));
+                break;
+            case "Traffic Accident" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_car_yellow_24dp)));
+                break;
+            case "Broken Glass" :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_yellow_24dp)));
+                break;
+            default :
+                getMapRef().addMarker(new MarkerOptions()
+                        .position(newHazard.getLatLong())
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_error_yellow_24dp)));
+                break;
+        }
+
     }
 
     public String getDescription() {

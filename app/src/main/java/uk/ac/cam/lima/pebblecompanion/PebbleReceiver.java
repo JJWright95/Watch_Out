@@ -73,7 +73,7 @@ public class PebbleReceiver {
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
                                         .position(newh.getLatLong())
                                         .title(newh.getTitle())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_yellow))));
                                 //TODO:: Change colour when available
                                 break;
                             case "Flooding" :

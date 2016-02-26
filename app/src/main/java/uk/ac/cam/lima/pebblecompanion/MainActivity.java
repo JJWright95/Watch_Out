@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity
                                 h.setMarker(mMap.addMarker(new MarkerOptions()
                                         .position(h.getLatLong())
                                         .title(h.getTitle() + ": " + h.getDescription())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_red))));
                             //TODO:: Change colour when available
                         }
                     }
@@ -710,7 +710,7 @@ public class MainActivity extends AppCompatActivity
                         h.setMarker(mMap.addMarker(new MarkerOptions()
                                 .position(h.getLatLong())
                                 .title(h.getTitle() + ": " + h.getDescription())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block))));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_block_red))));
                         //TODO:: Change colour when available
                     }
                     break;

@@ -32,6 +32,12 @@ public class PebbleMessage {
      */
     public enum ActionType { ACK, DIS, NACK }
 
+    /**
+     * Builds the appropriate message to start up a new alert on the Pebble.
+     * @param h The hazard to alert the user of.
+     * @param hazard_dist The approximate distance to the hazard.
+     * @return The message ready to be sent by PebbleSender.
+     */
     public static PebbleDictionary createAlert(Hazard h, int hazard_dist) {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(Key.TYPE.ordinal(), Type.ALERT.ordinal());
@@ -42,6 +48,11 @@ public class PebbleMessage {
         return dict;
     }
 
+    /**
+     * Builds the appropriate message to remove an alert from the Pebble.
+     * @param h The hazard whose alert should be removed.
+     * @return The message to be sent by PebbleSender.
+     */
     public static PebbleDictionary createIgnore(Hazard h) {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(Key.TYPE.ordinal(), Type.IGNORE.ordinal());
@@ -49,6 +60,12 @@ public class PebbleMessage {
         return dict;
     }
 
+    /**
+     * Builds the appropriate message to update the approximate distance on the Pebble's alert
+     * @param h The hazard whose distance is being updated.
+     * @param hazard_dist The new approximate distance.
+     * @return The message to be sent by PebbleSender
+     */
     public static PebbleDictionary createUpdate(Hazard h, int hazard_dist) {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(Key.TYPE.ordinal(), Type.UPDATE.ordinal());

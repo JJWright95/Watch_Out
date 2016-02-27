@@ -43,14 +43,21 @@ public class PebbleReceiver {
      * @param mainAct Main Activity of the App.
      */
     public static void startReceiver(final MainActivity mainAct, RunLoop rl) {
+        // Setup static fields
         parent = mainAct;
         runloop = rl;
         cm = (ConnectivityManager) parent.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         lastTransactionTime = new Date();
+
+        // Define the data receiver module
         mDataReceiver = new PebbleKit.PebbleDataReceiver(PebbleSender.PEBBLE_APP_UUID) {
+
+            // Called when the phone receives a message from the Pebble
             @Override
             public void receiveData(Context context, int transactionId, PebbleDictionary dict) {
                 PebbleKit.sendAckToPebble(context, transactionId);
+
+                // Filter out duplicate messages
                 synchronized(lastTransactionTime) {
                     Date currentTime = new Date();
                     long timeDiff = currentTime.getTime() - lastTransactionTime.getTime();
@@ -58,14 +65,19 @@ public class PebbleReceiver {
                     if (timeDiff <= 2000) return;
                     lastTransactionTime = currentTime;
                 }
+
+                // Determine the type of message
                 switch (PebbleMessage.Type.values()[dict.getInteger(PebbleMessage.Key.TYPE.ordinal()).intValue()]) {
                     case NEW:
+                        // Create the new hazard object
                         Hazard newh = new Hazard(0, 0,
                                 dict.getString(PebbleMessage.Key.HAZARD_TYPE.ordinal()),
                                 "",
                                 parent.getLocation().latitude,
                                 parent.getLocation().longitude);
                         HazardManager.newHazard(newh);
+
+                        // Add the marker onto the map with the correct icon
                         switch (newh.getTitle()) {
                             case "Road Works" :
                                 newh.setMarker(parent.mMap.addMarker(new MarkerOptions()
@@ -111,11 +123,13 @@ public class PebbleReceiver {
                         }
                         Log.i("DataReceiver", "Received New Hazard");
                         break;
+
                     case ACTION:
+                        // Identify the hazard in question and the action performed
                         int id = dict.getInteger(PebbleMessage.Key.HAZARD_ID.ordinal()).intValue();
                         switch (PebbleMessage.ActionType.values()[dict.getInteger(PebbleMessage.Key.ACTION.ordinal()).intValue()]) {
-                            case ACK:
-                                // User acknowledged the hazard
+                            case ACK: // User acknowledged the hazard
+                                // Send update to server
                                 try {
                                     AsyncTask<JSONObject, Void, Void> uploadTask = new AsyncTask<JSONObject, Void, Void>() {
                                         @Override
@@ -143,11 +157,13 @@ public class PebbleReceiver {
                                 } catch (ClassCastException cce) {
                                     cce.printStackTrace();
                                 }
+
+                                // Move the hazard to inactiveHazards
                                 runloop.removeActiveHazard(id);
                                 Log.i("DataReceiver", "Received Ack");
                                 break;
-                            case DIS:
-                                // User did not see the hazard
+                            case DIS: // User did not see the hazard
+                                // Send update to server
                                 try {
                                     AsyncTask<JSONObject, Void, Void> uploadTask = new AsyncTask<JSONObject, Void, Void>() {
                                         @Override
@@ -175,11 +191,14 @@ public class PebbleReceiver {
                                 } catch (ClassCastException cce) {
                                     cce.printStackTrace();
                                 }
+
+                                // Move the hazard to inactiveHazards
                                 runloop.removeActiveHazard(id);
                                 Log.i("DataReceiver", "Received Dismissal");
                                 break;
-                            case NACK:
-                                // User dismissed the alert
+
+                            case NACK: // User dismissed the alert by pressing back
+                                // Move the hazard to inactiveHazards
                                 runloop.removeActiveHazard(id);
                                 Log.i("DataReceiver", "Received Nack");
                                 break;
@@ -191,6 +210,8 @@ public class PebbleReceiver {
                 }
             }
         };
+
+        // Start receiving
         PebbleKit.registerReceivedDataHandler(parent.getApplicationContext(), mDataReceiver);
     }
 

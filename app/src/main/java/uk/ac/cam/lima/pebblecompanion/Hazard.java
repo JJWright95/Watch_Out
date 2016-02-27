@@ -18,6 +18,8 @@ public class Hazard implements Comparable<Hazard> {
     private SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static int newid = 0;
 
+
+    //Constructor for Hazard Objects
     public Hazard(int newacks, int newdiss, String newtitle, String newdescription, double newlat,
                   double newlong){
         acks = newacks;
@@ -31,6 +33,7 @@ public class Hazard implements Comparable<Hazard> {
         id = newid++;
     }
 
+    //Constructor for Hazards that use a JSONObject downloaded from the server
     public Hazard(JSONObject jsonInput) {
 
         try {
@@ -54,6 +57,8 @@ public class Hazard implements Comparable<Hazard> {
         }
 
     }
+
+    //Various getters and setters
 
     //LatLng required by maps API to draw pin, use this for drawing pins
     public LatLng getLatLong(){
@@ -116,6 +121,8 @@ public class Hazard implements Comparable<Hazard> {
 
     public void setMarker(Marker m) { marker = m; }
 
+
+    //Method for converting a Hazard to a JSONObject for uploading to the server
     public JSONObject toJSON(){
         JSONObject outputJSON = new JSONObject();
         try {
@@ -139,6 +146,8 @@ public class Hazard implements Comparable<Hazard> {
 
         return outputJSON;
     }
+
+    //Methods for checking if Hazards are equal
 
     @Override
     public boolean equals(Object obj) {

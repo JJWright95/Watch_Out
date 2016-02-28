@@ -71,8 +71,6 @@ public class MainActivity extends AppCompatActivity
     private static final int LOCATION_DATA_FREQUENCY = 500;
     // map on main app display. Needs package access for drawing new hazards in PebbleReceiver
     GoogleMap mMap;
-    //adds line to track current run
-    Polyline line;
     // google services client
     private GoogleApiClient mGoogleApiClient;
     // last location returned by the GPS
@@ -91,26 +89,18 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab_run;
 
     private boolean road_works_marker_set = true;
-
     private boolean pothole_marker_set = true;
-
     private boolean road_closure_marker_set = true;
-
     private boolean flooding_marker_set = true;
-
     private boolean traffic_accident_marker_set = true;
-
     private boolean broken_glass_marker_set = true;
-
     private boolean other_marker_set = true;
-
-    private List<LatLng> locationsList = new LinkedList();
 
     private Thread runLoopThread;
     private RunLoop runLoop;
     Handler handler;
 
-
+    // Called when app initially started.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,7 +131,7 @@ public class MainActivity extends AppCompatActivity
         // request location data and set update frequency
         createLocationRequest();
 
-
+        // Floating action button to set map to focus on user's location.
         fab_gps = (FloatingActionButton) findViewById(R.id.fab_gps);
         fab_gps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,9 +143,9 @@ public class MainActivity extends AppCompatActivity
                     // toggle camera centring on user with default zoom.
                     if (!gpsTracking) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                // zoom value 15 should use constant
                                 new LatLng(mLastLocation.getLatitude(),
                                         mLastLocation.getLongitude()), DEFAULT_ZOOM));
+                        // update button icon.
                         fab_gps.setImageResource(R.drawable.ic_gps_fixed_blue);
                     } else {
                         fab_gps.setImageResource(R.drawable.ic_my_location);
@@ -165,6 +155,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        // Floating action button to start/stop current run.
         fab_run = (FloatingActionButton) findViewById(R.id.fab_start_run);
         fab_run.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,17 +165,16 @@ public class MainActivity extends AppCompatActivity
                 settingsRequest();
                 if (!running) {
 					runLoop.setRunState(RunLoop.RunState.ACTIVE);
-                    // also need to update the button drawable to a stop run state.
+                    // update button icon
                     fab_run.setImageResource(R.drawable.ic_action_playback_stop);
                     running = !running;
-                    line.setVisible(true);
                 } else {
                     fab_run.setImageResource(R.drawable.ic_directions_run_white);
                     running = !running;
-                    // TODO: some static message perhaps
+                    // update button icon
                     runLoop.setRunState(RunLoop.RunState.INACTIVE);
                     PebbleSender.stopSending();
-                    // launch review activity
+                    // launch review activity if new hazards recorded
                     if (HazardManager.getNewHazardSet().size() > 0) {
                         Intent openReview = new Intent(fab_run.getContext(), ReviewActivity.class);
                         startActivityForResult(openReview, 0);
@@ -192,8 +182,6 @@ public class MainActivity extends AppCompatActivity
                             h.setMarker(null);
                         }
                     }
-                    line.setVisible(false);
-                    locationsList = new LinkedList();
                 }
             }
         });
@@ -208,35 +196,27 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Log.i("DataSender", "About to start app");
         PebbleKit.startAppOnPebble(getApplicationContext(), PebbleSender.PEBBLE_APP_UUID);
-        //Log.i("DataSender", "App started");
 
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                if(msg.what==0){
+                if(msg.what == 0){
                     updateMapMarkers();
                 }
                 super.handleMessage(msg);
             }
         };
 
-        //if (mLastLocation != null) {
-            runLoop = new RunLoop(this);
-            //Log.i("DataSender", "RunLoop created");
-            PebbleSender.startSender(this);
-            //Log.i("DataSender", "Sender started");
-            PebbleReceiver.startReceiver(this, runLoop);
-            //Log.i("DataSender", "Receiver Started");
-        //}
+        runLoop = new RunLoop(this);
+        PebbleSender.startSender(this);
+        PebbleReceiver.startReceiver(this, runLoop);
 
-        //if (runLoopThread == null) {
-            runLoopThread = new Thread(runLoop);
-            runLoopThread.start();
-        //}
+        runLoopThread = new Thread(runLoop);
+        runLoopThread.start();
     }
 
+    // Callback method called by system when map loaded and ready.
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -246,7 +226,6 @@ public class MainActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-
             // MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION is an
             // app-defined int constant. The callback method gets the
             // result of the request.
@@ -256,30 +235,25 @@ public class MainActivity extends AppCompatActivity
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        //adds polyline to the map
-        line = mMap.addPolyline(new PolylineOptions()
-                .width(10)
-                .color(Color.BLUE));
+        // draw hazards from database on map.
         updateMapMarkers();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay!
+                    // permission was granted, do nothing and continue
                 } else {
-                    // permission denied, boo!
+                    // permission denied
                     Toast.makeText(MainActivity.this, "LOCATION_ACCESS Denied", Toast.LENGTH_SHORT)
                             .show();
                 }
                 return;
             }
-            // TODO: need network permissions for database interaction
         }
     }
 
@@ -294,14 +268,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    // Handle clicks for options within app drawer - change map type, drawer hazard markers
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
         Set<Hazard> hazardSet = HazardManager.getHazardSet();
         switch (id) {
-            // TODO:: Add option for user-generated hazards
             case R.id.map_satellite:
                 if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -504,6 +476,8 @@ public class MainActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    // callbeack method for when system detects location changed
+    // updates last known location field.
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
@@ -513,42 +487,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // called hen app started, connect to google services and hazard database.
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
+                Action.TYPE_VIEW,
+                "Main Page",
                 Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
                 Uri.parse("android-app://uk.ac.cam.lima.pebblecompanion/http/host/path")
         );
         AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
     }
 
+    // called when app closes, disconnect from google services
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
+                Action.TYPE_VIEW,
+                "Main Page",
                 Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
                 Uri.parse("android-app://uk.ac.cam.lima.pebblecompanion/http/host/path")
         );
         AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
+    // Called when app leaves foreground
     @Override
     protected void onPause() {
         super.onPause();
@@ -558,6 +527,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Called when app regains foreground.
     @Override
     public void onResume() {
         super.onResume();
@@ -603,7 +573,6 @@ public class MainActivity extends AppCompatActivity
         }
         // get initial location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
         // start requesting periodic location updates
         mRequestingLocationUpdates = true;
         startLocationUpdates();
@@ -625,7 +594,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     // check settings for location, if switched off, open user dialog request.
-    // TODO: check network settings
     public void settingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
@@ -661,6 +629,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -678,32 +647,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // value determines whether location data is being received
     boolean locationReady() {
         return !(mLastLocation == null);
     }
 
+    // returns current location of user
     LatLng getLocation() {
+        // wait until location data available
         while (!locationReady()) {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    //if (locationReady()) {
-                    //    return;
-                    //}
                 }
             }, 1000);
-            /*if (locationReady()) {
-                return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            }*/
-            //Log.i("MainAct", "Waited a sec");
         }
         LatLng currLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        locationsList.add(currLoc);
         return currLoc;
     }
 
+    // draw hazard markers on map.
     private void updateMapMarkers() {
-        if (running) line.setPoints(locationsList);
         for (Hazard h : HazardManager.getHazardSet()) {
             if (h.getMarker() != null) continue;
             switch (h.getTitle()) {

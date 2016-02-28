@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class HazardReviewFragment extends Fragment {
 
+    private static final int FOCUS_ZOOM = 13;
+
     View rootView;
 
     private static ReviewActivity revActivity;
@@ -57,6 +59,7 @@ public class HazardReviewFragment extends Fragment {
         return rootView;
     }
 
+    // callback method to detect whether fragment is visible to user.
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -81,9 +84,8 @@ public class HazardReviewFragment extends Fragment {
 
     // position and zoom map to show current hazard under review
     private void focus() {
-        // TODO: should use constant here for zoom value
         getMapRef().animateCamera(CameraUpdateFactory.newLatLngZoom(
-                newHazard.getLatLong(), 13));
+                newHazard.getLatLong(), FOCUS_ZOOM));
         switch (newHazard.getTitle()) {
             case "Road Works" :
                 getMapRef().addMarker(new MarkerOptions()
@@ -131,6 +133,7 @@ public class HazardReviewFragment extends Fragment {
 
     }
 
+    // return hazard description entered by user
     public String getDescription() {
         EditText descriptionField = (EditText) rootView.findViewById(R.id.hazard_description);
         return descriptionField.getText().toString();

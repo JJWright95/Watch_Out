@@ -53,14 +53,10 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    // The {@link ViewPager} that will host the section contents.
     private ViewPager mViewPager;
 
     private GoogleMap mMap;
-    //private GoogleApiClient mGoogleApiClient;
-
 
     private ConnectivityManager cm;
 
@@ -87,14 +83,16 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }
 
+    // returns a reference to the sectionsPageAdapter so that review activity can access fragments
+    // controlled by the section page adapter.
     public SectionsPagerAdapter getSectionsPagerAdapterRef() {
         return mSectionsPagerAdapter;
     }
 
+    // when app regains foreground update set of new hazards from hazard manager.
     @Override
     public void onResume() {
         super.onResume();
-        //mSectionsPagerAdapter.newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
         mSectionsPagerAdapter.newHazards = HazardManager.getNewHazardSet();
     }
 
@@ -111,41 +109,14 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
         return mMap;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_review, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     /* A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the hazards to be reviewed.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        // generate required fragments and store in arraylist.
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            /*for (int i=0; i<newHazards.size(); i++) {
-                HazardReviewFragment newFrag = new HazardReviewFragment();
-                newFrag.setRevActivityRef(ReviewActivity.this);
-                newFrag.setHazard(newHazards.get(i));
-                frags.add(newFrag);
-            }*/
             for (Hazard h : newHazards) {
                 HazardReviewFragment newFrag = new HazardReviewFragment();
                 newFrag.setRevActivityRef(ReviewActivity.this);
@@ -156,7 +127,7 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
             lastFrag.setRevActivityRef(ReviewActivity.this);
         }
 
-
+        // load fragment at the specified position.
         @Override
         public Fragment getItem(int position) {
             if (position < frags.size()) {
@@ -172,6 +143,7 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
             return newHazards.size()+1;
         }
 
+        // get position on map to fit all new hazards on screen
         public LatLng getCentrePos() {
             double lat = 0;
             double lon = 0;
@@ -182,10 +154,8 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
             return new LatLng(lat / newHazards.size(), lon / newHazards.size());
         }
 
+        // upload new hazards to database
         public void upload() {
-            /*for (int i=0; i<newHazards.size(); i++) {
-                newHazards.get(i).setDescription(frags.get(i).getDescription());
-            }*/
             for (int i = 0; i< newHazards.size(); i++) {
                 frags.get(i).getHazard().setDescription(frags.get(i).getDescription());
             }
@@ -223,12 +193,14 @@ public class ReviewActivity extends AppCompatActivity implements OnMapReadyCallb
                     }
                 }
             }
+            // close activity since review of hazards complete
             finish();
         }
 
+        // fragment to upload new hazards to database.
         UploadFragment lastFrag;
+        // list of fragments for hazards under review
         ArrayList<HazardReviewFragment> frags = new ArrayList<HazardReviewFragment>();
-        //ArrayList<Hazard> newHazards = new ArrayList<Hazard>(HazardManager.getNewHazardSet());
         Set<Hazard> newHazards = HazardManager.getNewHazardSet();
     }
 }

@@ -17,22 +17,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link UploadFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link UploadFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UploadFragment extends Fragment {
 
+    private static final int REVIEW_ZOOM = 11;
+
+    // reference to ReviewActivity which manages fragments.
     private  ReviewActivity revActivity;
 
     public void setRevActivityRef(ReviewActivity rev) {
         revActivity = rev;
     }
 
+    // reference to google map in ReviewActivity to allow manipulation - zoom in on hazard under review.
     public GoogleMap getMapRef() {
         return revActivity.getMapRef();
     }
@@ -50,6 +46,7 @@ public class UploadFragment extends Fragment {
         return rootView;
     }
 
+    // callback method to detect which fragment is currently visible to the user
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -72,12 +69,15 @@ public class UploadFragment extends Fragment {
 
     // position and zoom map to show all new hazards.
     private void focus() {
-        // TODO: should use constant here for zoom value
         if (revActivity == null) Log.i("UploadFragment", "revActivity not setup");
         if (getMapRef() == null) Log.i("UploadFragment", "map ref is null");
-        if (revActivity.getSectionsPagerAdapterRef() == null) Log.i("UploadFragment", "sectionsPagerAdapterRef is null");
-        if (revActivity.getSectionsPagerAdapterRef().getCentrePos() == null) Log.i("UploadFragment", "sectionsPagerAdapterRef.centrePos is null");
+        if (revActivity.getSectionsPagerAdapterRef() == null) {
+            Log.i("UploadFragment", "sectionsPagerAdapterRef is null");
+        }
+        if (revActivity.getSectionsPagerAdapterRef().getCentrePos() == null) {
+            Log.i("UploadFragment", "sectionsPagerAdapterRef.centrePos is null");
+        }
         getMapRef().animateCamera(CameraUpdateFactory.newLatLngZoom(
-                revActivity.getSectionsPagerAdapterRef().getCentrePos(), 11));
+                revActivity.getSectionsPagerAdapterRef().getCentrePos(), REVIEW_ZOOM));
     }
 }

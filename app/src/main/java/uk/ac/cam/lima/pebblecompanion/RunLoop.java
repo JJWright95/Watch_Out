@@ -109,8 +109,6 @@ class RunLoop implements Runnable {
             currentLocation = parent.getLocation();
             Date currentTime = new Date();
 
-            //logNewHazards();
-
             // update the cache if the distance from the last update has equalled or exceeded CACHE_RADIUS or the time from the last update is at least CACHE_TIMEOUT
             if (RunLoop.calculateDistance(this.lastCachedLocation, currentLocation) >= CACHE_RADIUS
                     || currentTime.getTime() - this.lastCachedTime.getTime() >= CACHE_TIMEOUT) {

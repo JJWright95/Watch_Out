@@ -41,8 +41,8 @@ class RunLoop implements Runnable {
     private static final int CACHE_TIMEOUT = 240000;
     private static final double CACHE_RADIUS = 1000;
     private static final int LOOP_DELAY_ACTIVE = 5000;
-    private static final int LOOP_DELAY_INACTIVE = 30000;
-    private static final double WARN_DISTANCE = 150;
+    private static final int LOOP_DELAY_INACTIVE = 5000;
+    private static final double WARN_DISTANCE = 15;
     private static final int WARN_DELAY = 60000;
 
     private LatLng lastCachedLocation;
@@ -142,9 +142,9 @@ class RunLoop implements Runnable {
                     for (Iterator<Hazard> it = this.activeHazards.iterator(); it.hasNext(); ) {
                         Hazard h = it.next();
                         double distanceFromH = RunLoop.calculateDistance(h.getLatLong(), currentLocation);
-                        if (distanceFromH <= WARN_DISTANCE) // (I)
+                        /*if (distanceFromH <= WARN_DISTANCE) // (I)
                             PebbleSender.send(PebbleMessage.createUpdate(h, (int) distanceFromH));
-                        else { // (II)
+                        else { // (II)*/
                         if (distanceFromH > WARN_DISTANCE) {
                             PebbleSender.send(PebbleMessage.createIgnore(h));
                             this.inactiveHazards.put(h, currentTime);
